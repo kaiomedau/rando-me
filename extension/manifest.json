@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "Rando.me",
+  "description": "Random GIFs for you",
+  "version": "0.1",
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+
+  "permissions": [
+    "storage",
+    "http://baleiabalao.com/"
+  ]
+
+}

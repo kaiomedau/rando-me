@@ -1,0 +1,168 @@
+<!doctype html>
+<!--
+ This page is shown when the extension button is clicked, because the
+ "browser_action" field in manifest.json contains the "default_popup" key with
+ value "popup.html".
+ -->
+<html>
+  <head>
+    <title>Rando.me a GIF</title>
+    <style>
+    input:focus,select:focus,textarea:focus,button:focus {
+        outline: none;
+    }
+      body {
+        font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
+        font-size: 100%;
+        background: #34414c;
+        width: 400px;
+        margin: 0;
+        padding: 0;
+      }
+      img{
+        max-width: 340px;
+        height: auto;
+        max-height: 380px;
+      }
+      #gif_url {
+        white-space: pre;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        display: block;
+        font-size: 10px;
+        padding: 11px 25px;
+        background: #3c4b58;
+        border-radius: 8px;
+        margin-top: 12px;
+        box-shadow: 0px 2px 0px #2f3d48;
+      }
+      #image-result{
+        display: block;
+        margin: 0 auto;
+      }
+      #loading{
+        width: 16px;
+        height: 200px;
+        background: url(ajax-loader.gif) no-repeat 50% 50%;
+        margin: 0 auto;
+      }
+      #wrapper{
+        background: #34414c;
+        text-align: center;
+        padding: 30px;
+        color: #506272;
+        /*min-height: 200px;*/
+      }
+
+      header, footer{
+        background: #2f3d48;
+        padding: 14px 20px;
+        width: 360px;
+        height: auto;
+        overflow: auto;
+      }
+      header{
+        border-top: solid 3px #d92196;
+
+      }
+      footer{
+        border-bottom: solid 3px #38d385;
+      }
+      #random_term{
+        background: #1f2b35;
+        border: none;
+        border-radius: 8px 0 0 8px;
+        min-height: 22px;
+        max-height: 22px;
+        padding: 10px 20px;
+        color: #2196d9;
+        float: left;
+        font-weight: bold;
+        width: 260px;
+        font-size: 14px;
+      }
+      #callgif{
+        background: url(magnifying.png) no-repeat 50% 50% #38d385;
+        border: none;
+        border-radius: 0 8px 8px 0;
+        width: 60px;
+        height: 42px;
+        float: left;
+      }
+        #callgif:hover{
+          background-color: #d92196;
+        }
+
+      #recent_terms{
+        max-height: 30px;
+        overflow: hidden;
+      }
+      .search-term{
+        background: #38d385;
+        border-radius: 6px;
+        overflow: auto;
+        display: inline-block;
+        color: #0d703e;
+        font-size: 12px;
+        padding-left: 12px;
+        vertical-align:middle;
+        margin-right: 14px;
+        margin-bottom: 14px;
+        box-shadow: 0 2px 0 #179555;
+        cursor: pointer;
+      }
+        .search-term:last-child{
+          margin-right:0;
+        }
+        .search-term .term{
+          padding-top: 7px;
+          display: inline-block;
+        }
+          .search-term:hover{
+            background-color: #32c97d;
+            color: #084b29;
+          }
+        .search-term .remove-term{
+          background: #32c97d;
+          height: 28px;
+          width: 24px;
+          float: right;
+          border: none;
+          color: #0d703e;
+          margin-left: 6px;
+        }
+          .search-term .remove-term:hover{
+            background-color: #23aa66;
+          }
+            .search-term .remove-term:active{
+              background-color: #148d50;
+            }
+
+    </style>
+
+
+    <script src="popup.js"></script>
+  </head>
+  <body>
+    <header>
+
+        <input id="random_term" value="Dog" placeholder="o.O">
+        <button id="callgif"></button>
+
+    </header>
+
+    <div id="wrapper">
+      <div id="loading" hidden></div>
+      <img id="image-result" hidden>
+      <div id="gif_url">GIF URL</div>
+    </div>
+
+    <footer>
+      <nav id="recent_terms">
+        <!-- <div class="search-term"><div class="term">dog</div><button class="remove-term">x</button></div> -->
+      </nav>
+    </footer>
+
+  </body>
+</html>
+
