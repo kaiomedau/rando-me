@@ -267,12 +267,10 @@ function renderGifResponse(gifURL, gifWidth, gifHeight) {
     document.getElementById('gif_url').textContent = status;
 
     var imageResult = document.getElementById('gif_img');
-    if(gifURL){
-      imageResult.width = gifWidth;
-      imageResult.height = gifHeight;
-    }
     imageResult.src = "";
     imageResult.src = gifURL ? gifURL : "images/sad-face.png";
+    imageResult.width = gifURL ? gifWidth : 335;
+    imageResult.height = gifURL ? gifHeight : 180;
 
     changeLoaderVisibility(true);
 
