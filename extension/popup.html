@@ -1,9 +1,5 @@
 <!doctype html>
-<!--
- This page is shown when the extension button is clicked, because the
- "browser_action" field in manifest.json contains the "default_popup" key with
- value "popup.html".
- -->
+
 <html>
   <head>
     <title>Rando.me a GIF</title>
@@ -22,38 +18,8 @@
       img{
         max-width: 340px;
         height: auto;
-        max-height: 380px;
+        max-height: 360px;
       }
-      #gif_url {
-        white-space: pre;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        display: block;
-        font-size: 10px;
-        padding: 11px 25px;
-        background: #3c4b58;
-        border-radius: 8px;
-        margin-top: 12px;
-        box-shadow: 0px 2px 0px #2f3d48;
-      }
-      #image-result{
-        display: block;
-        margin: 0 auto;
-      }
-      #loading{
-        width: 16px;
-        height: 200px;
-        background: url(ajax-loader.gif) no-repeat 50% 50%;
-        margin: 0 auto;
-      }
-      #wrapper{
-        background: #34414c;
-        text-align: center;
-        padding: 30px;
-        color: #506272;
-        /*min-height: 200px;*/
-      }
-
       header, footer{
         background: #2f3d48;
         padding: 14px 20px;
@@ -68,7 +34,52 @@
       footer{
         border-bottom: solid 3px #38d385;
       }
-      #random_term{
+      #gif_url {
+        white-space: pre;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        display: block;
+        font-size: 10px;
+        padding: 11px 25px;
+        background: #3c4b58;
+        border-radius: 8px;
+        margin-top: 12px;
+        box-shadow: 0px 2px 0px #2f3d48;
+      }
+        #gif_url::selection {
+          background: red;
+        }
+      #gif_img{
+        display: block;
+        margin: 0 auto;
+        border-radius: 4px;
+        min-height: 200px;
+      }
+      #loading{
+        width: 100%;
+        height: 100%;
+        background: url(images/ajax-loader.gif) no-repeat 50% 50%;
+        background-color: rgba(40, 54, 64, .8);
+        position: absolute;
+        top: 0;
+        left: 0;
+        visibility: visible;
+        opacity: 1;
+      }
+        #loading.hidden{
+          transition: all 1s;
+          opacity: 0;
+          visibility: hidden;
+        }
+      #wrapper{
+        background: url(images/rando_bg.png) no-repeat 50% 50% #34414c;
+        text-align: center;
+        padding: 30px;
+        color: #506272;
+        position: relative;
+        min-height: 200px;
+      }
+      #search_term{
         background: #1f2b35;
         border: none;
         border-radius: 8px 0 0 8px;
@@ -78,18 +89,31 @@
         color: #2196d9;
         float: left;
         font-weight: bold;
-        width: 260px;
+        width: 160px;
         font-size: 14px;
       }
-      #callgif{
-        background: url(magnifying.png) no-repeat 50% 50% #38d385;
+      #request_gif{
+        background: url(images/magnifying.png) no-repeat 50% 50% #38d385;
         border: none;
         border-radius: 0 8px 8px 0;
         width: 60px;
         height: 42px;
         float: left;
       }
-        #callgif:hover{
+        #thumbs_up{
+          background: url(images/thumbs-up.png) no-repeat 50% 50% #f07938;
+          width: 54px;
+          height: 42px;
+          display: inline-block;
+          border: none;
+          border-radius: 8px;
+          float: left;
+          margin-left: 12px;
+        }
+          #thumbs_up:hover{
+            background-color: #ff6b1b;
+          }
+        #request_gif:hover{
           background-color: #d92196;
         }
 
@@ -137,7 +161,16 @@
             .search-term .remove-term:active{
               background-color: #148d50;
             }
-
+      #rando_logo{
+        width: 20px;
+        height: 20px;
+        display: block;
+        -webkit-mask-image: url(images/rando_logo.svg);
+        mask-image: url(images/rando_logo.svg);
+        float: left;
+        background-color: #38d385;
+        margin:12px 14px 0 0;
+      }
     </style>
 
 
@@ -145,16 +178,16 @@
   </head>
   <body>
     <header>
-
-        <input id="random_term" value="Dog" placeholder="o.O">
-        <button id="callgif"></button>
-
+        <div id="rando_logo" class="green" title="Rando.me a GIF"></div>
+        <input id="search_term" value="Dog" placeholder="o.O">
+        <button id="request_gif"></button>
+        <button id="thumbs_up"></button>
     </header>
 
     <div id="wrapper">
-      <div id="loading" hidden></div>
-      <img id="image-result" hidden>
+      <img id="gif_img" hidden>
       <div id="gif_url">GIF URL</div>
+      <div id="loading" class="hidden"></div>
     </div>
 
     <footer>

@@ -1,87 +1,152 @@
-// Copyright (c) 2014 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
 
-var recent_terms_limit = 5;
-var recent_terms_array = new Array();
+var api_url_path = "http://baleiabalao.com/giphy/?gif="; //API Path to call
+var recent_terms_limit = 5; // Limit search terms to store
+var recent_terms_array = new Array(); //Array to handle the recent terms
+
+var consts = {
+  recent_term_prefix: "rt_",
+  recent_term_button_prefix: "brt_",
+};
 
 
-function recentSearchTerms(){
-  chrome.storage.sync.get("recent", function( items ) {
-    return items.recent ? items.recent : null;
-  });
-}
+//As soon DOM complete loading, add all primary event listeners
+//Also populates the recent terms and make a initial search to present a random gif
+document.addEventListener('DOMContentLoaded', function() {
 
-function termSlug(term,prefix){
+    //Add the action to the search button
+    var search_btn = document.getElementById('request_gif');
+    search_btn.addEventListener('click', function() {
+        handleSearchClick();
+    });
+
+    //Add the action to the search field when the ENTER key is pressed
+    var search_field = document.getElementById('search_term');
+    search_field.addEventListener('keypress', function(e) {
+      if (e.keyCode == '13') {
+        handleSearchClick();
+      }
+    });
+
+    //Add the action to the thumbs up button
+    var thumbs = document.getElementById('thumbs_up');
+    thumbs.addEventListener('click', function() {
+        requestGif('thumbs up',false);
+    });
+
+    //Displays the recent tems
+    populateRecentSeachTerms();
+
+    //Make a initial search
+    requestGif('dancing',false);
+
+});
+
+//**********************************
+//      RECENT SEARCH TERMS
+//**********************************
+
+//Return a slug containing only tha A to Z characters
+//If given a prefix, the result will contain it
+function termSlug( term, prefix ){
   var slug = term.replace(/[^a-zA-Z ]/g, "");
       return prefix ? prefix+slug : slug;
 }
 
-function searchTermToHTML(term){
-  var slug    = termSlug(term,"rt_");
-  var btnSlug = termSlug(term,"brt_");
+//Return a HTML code for the RECENTS footer containing the given term
+function searchTermToHTML( term ){
+  var slug    = termSlug(term,consts.recent_term_prefix);
+  var btnSlug = termSlug(term,consts.recent_term_button_prefix);
   return "<div class='search-term'><div class='term' id='"+ slug +"'>"+term+"</div><button class='remove-term' id='" + btnSlug + "''>x</button></div>";
+}
+
+//Erase all recent terms from Sync and Local
+function clearRecentsStorage(){
+  chrome.storage.sync.remove("recent");
 }
 
 function populateRecentSeachTerms(){
 
-// chrome.storage.sync.remove("recent");
-// return;
+  //******* Used for debug
+  // clearRecentsStorage();
+  // return;
+  //******* END Used for debug
 
   chrome.storage.sync.get("recent", function( items ) {
-    if( !items || !items.recent ){ console.log("No recent search terms found"); return; }
+
+    //Check if has any recent terms
+    if( !items || !items.recent ){
+      console.log("[populateRecentSeachTerms]:", "No recent search terms found");
+      return;
+    }
 
     var rt = items.recent;
     var rt_container = document.getElementById('recent_terms');
 
-    var echo = "";
+    var echo = ""; //Final printable HTML
     for (var i = 0; i < rt.length; i++) {
-      echo += searchTermToHTML(rt[i]);
+      echo += searchTermToHTML(rt[i]); //Get the HTML code and add to the final output
     };
 
+    //Insert the final content to container
     rt_container.innerHTML = echo;
 
+    //Store the recent terms to create the recent buttons actions
     recent_terms_array = rt;
+    //Add the necessary actions to all recent buttons
     handleRecentTermsListeners();
 
   });
 
 }
- function handleRecentTermsListeners(){
-  if(!recent_terms_array || !recent_terms_array.length){return;}
 
+
+function handleRecentTermsListeners(){
+  if(!recent_terms_array || !recent_terms_array.length){
+    return;
+  }
+
+  //Loop to get all Buttons and add the listeners to it
   for (var i = 0; i < recent_terms_array.length; i++) {
 
-    document.getElementById('rt_' + recent_terms_array[i] ).addEventListener('click', function() {
-      document.getElementById('random_term').value = this.innerHTML;
-      handleClick();
+    var obj = termSlug( recent_terms_array[i] , consts.recent_term_prefix );
+    document.getElementById( obj ).addEventListener('click', function() {
+      document.getElementById('search_term').value = this.innerHTML;
+      handleSearchClick();
     });
 
-    document.getElementById('brt_' + recent_terms_array[i] ).addEventListener('click', function() {
-      var term = this.id;
-          term = term.replace( "brt_", "" );
+    var btObj = termSlug( recent_terms_array[i] , consts.recent_term_button_prefix );
+    document.getElementById( btObj ).addEventListener('click', function() {
+
+      var objID = this.id;
+          objID = objID.replace( consts.recent_term_button_prefix, consts.recent_term_prefix );
+
+      var term  = document.getElementById( objID ).innerHTML;
 
       removeRecentSearchTerm( term );
+
     });
 
   };
 
  }
 
-
+//Remove a speific recent term
+//triggered by the recent term X button
 function removeRecentSearchTerm(term){
   term = term.toLowerCase();
+  console.log("[removeRecentSearchTerm]:", "Term to remove:",term)
 
-  chrome.storage.sync.get("recent", function( items ) {
+  chrome.storage.sync.get( "recent", function( items ) {
     if(!items || !items.recent){ return; }
 
     var rt = items.recent;
     var rtIndex = rt.indexOf(term);
+
     if(rtIndex > -1){
       rt.splice(rtIndex, 1);
 
-      chrome.storage.sync.set({"recent": rt}, function() {
-          console.log( "Term removed", term,recent_terms );
+      chrome.storage.sync.set({ "recent" : rt }, function() {
+          console.log( "[removeRecentSearchTerm]:","Term removed:",term );
       });
     }
 
@@ -95,9 +160,7 @@ function removeRecentSearchTerm(term){
 function handleSearchTerms(term){
   term = term.toLowerCase();
 
-  // console.log("nova funcao", recentSearchTerms());
-
-  chrome.storage.sync.get("recent", function( items ) {
+  chrome.storage.sync.get( "recent" , function( items ) {
 
     var recent_terms = items.recent;
 
@@ -113,21 +176,20 @@ function handleSearchTerms(term){
         }
 
         recent_terms.unshift(term);
-        chrome.storage.sync.set({"recent": recent_terms}, function() {
+
+        chrome.storage.sync.set({ "recent" : recent_terms}, function() {
           console.log( "Term saved",recent_terms );
         });
 
       }
 
-      console.log( recent_terms.indexOf(term) );
-
     }else{
 
-      console.log("Ainda não temos termos salvos");
+      console.log("[handleSearchTerms]:","No recent terms found yet");
 
       recent_terms = new Array(term);
-      chrome.storage.sync.set({"recent": recent_terms}, function() {
-        console.log( "First Recent Term Saved", recent_terms );
+      chrome.storage.sync.set({ "recent" : recent_terms}, function() {
+        console.log( "[handleSearchTerms]:", "Recent storage created", recent_terms );
       });
 
     }
@@ -136,101 +198,92 @@ function handleSearchTerms(term){
 
   });
 
-
 }
 
-// chrome.storage.onChanged.addListener(function(changes, namespace) {
-//   for (key in changes) {
-//     var storageChange = changes[key];
-//           console.log('Storage key "%s" in namespace "%s" changed. ' +
-//                       'Old value was "%s", new value is "%s".',
-//                       key,
-//                       namespace,
-//                       storageChange.oldValue,
-//                       storageChange.newValue);
-//   }
-// });
-
-
-document.addEventListener('DOMContentLoaded', function() {
-
-    var link = document.getElementById('callgif');
-    // var term = document.getElementsByClassName('term');
-    link.addEventListener('click', function() {
-        handleClick();
-    });
-
-});
-
-
-
-function handleClick(){
-
-  console.log( document.getElementById('random_term').value );
-  var term = document.getElementById('random_term').value;
-
+//Get the search term and request the GIF
+function handleSearchClick(){
+  var term = document.getElementById('search_term').value;
   if(term.length){
-    getGifImage(term);
-    handleSearchTerms(term);
-  }else{
-    console.log("sem termos para buscar");
+    requestGif( term, true);
   }
+}
 
+function requestGif(term, store_as_recent_term){
+  if(!term){ return; }
+
+  //Ask the server for a GIF
+  getGifImage( term );
+
+  //Save as recent term
+  if(store_as_recent_term){
+    handleSearchTerms(term);
+  }
 
 }
 
 function getGifImage( searchTerm ){
 
-  var loader = document.getElementById('loading');
-  loader.hidden = false;
+  //Show loading
+  changeLoaderVisibility(false);
 
-  console.log("Iniciando busca por",searchTerm);
+  console.log( "[getGifImage]:", "Requesting GIF for:", searchTerm );
 
-  var searchUrl = "http://baleiabalao.com/giphy/?gif=" + encodeURIComponent(searchTerm);
-  //"http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" + encodeURIComponent(searchTerm);
+  var searchUrl = api_url_path + encodeURIComponent(searchTerm);
 
-
+  //Create the request
   var x = new XMLHttpRequest();
   x.open('GET', searchUrl);
-  // The Google image search API responds with JSON, so let Chrome parse it.
   x.responseType = 'json';
   x.onload = function() {
 
-      console.log(x);
-    // Parse and process the response from Google Image Search.
-    var response = x.response;
-    if (!response || !response.data) {
-      console.log("Sem resultados");
-      return;
-    }
+  // console.log(x);
 
-    var gifURL = response.data.url;
-    console.log( gifURL );
+  var response = x.response;
+  if (!response || !response.data) {
+    console.log( "[getGifImage]:", "No response");
+    //TODO Show no response status
+    return;
+  }
 
-    loader.hidden = true;
+  //Response GIF data
+  var gifURL    = response.data.url;
+  var gifWidth  = response.data.width;
+  var gifHeight = response.data.height;
 
-    renderGifResponse(gifURL);
-
-  };
+  //Display final GIF
+  renderGifResponse(gifURL,gifWidth,gifHeight);
+};
   x.onerror = function() {
-    console.log('Network error.');
+    console.log("[getGifImage]:", 'Network error.');
     loader.hidden = true;
   };
   x.send();
 
 }
-function renderGifResponse(gifURL) {
 
-    gifURL = gifURL ? gifURL : "No GIFs found";
-    document.getElementById('gif_url').textContent = gifURL;
+function renderGifResponse(gifURL, gifWidth, gifHeight) {
 
-    var imageResult = document.getElementById('image-result');
-    // imageResult.width = width;
-    // imageResult.height = height;
+    var status = gifURL ? gifURL : "No GIF found. Sorry :(";
+    document.getElementById('gif_url').textContent = status;
+
+    var imageResult = document.getElementById('gif_img');
+    if(gifURL){
+      imageResult.width = gifWidth;
+      imageResult.height = gifHeight;
+    }
     imageResult.src = "";
-    imageResult.src = gifURL;
-    imageResult.hidden = false;
+    imageResult.src = gifURL ? gifURL : "images/sad-face.png";
+
+    changeLoaderVisibility(true);
 
 }
 
-populateRecentSeachTerms();
+function changeLoaderVisibility( hide_loader ){
+
+  var gifContainer    = document.getElementById('gif_img');
+  var loaderContainer = document.getElementById('loading');
+
+  loaderContainer.className = hide_loader ? "hidden" : "";
+
+  gifContainer.hidden = false;// = hide_loader ? false : true;
+}
