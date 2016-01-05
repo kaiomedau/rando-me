@@ -1,5 +1,5 @@
 
-var api_url_path = "http://baleiabalao.com/giphy/?gif="; //API Path to call
+var api_url_path = "http://baleiabalao.com/_apps/rando/?gif=";//"http://baleiabalao.com/giphy/?gif="; //API Path to call
 var recent_terms_limit = 5; // Limit search terms to store
 var recent_terms_array = new Array(); //Array to handle the recent terms
 
@@ -221,6 +221,39 @@ function requestGif(term, store_as_recent_term){
 
 }
 
+function requestGifFromServer( searchTerm ){
+  console.log( "[getGifImage]:", "Requesting GIF for:", searchTerm );
+
+  changeLoaderVisibility(false); //Show loading
+
+  var searchUrl = api_url_path + encodeURIComponent(searchTerm);
+  var x = new XMLHttpRequest(); //Create the request
+  x.open('GET', searchUrl);
+  x.responseType = 'json';
+  x.onload = function() {
+
+  var response = x.response;
+  if (!response || !response.data) {
+    console.log( "[getGifImage]:", "No response");
+    //TODO Show no response status
+    return;
+  }
+
+  //Response GIF data
+  var gifURL    = response.data.url;
+  var gifWidth  = response.data.width;
+  var gifHeight = response.data.height;
+
+  //Display final GIF
+  renderGifResponse(gifURL,gifWidth,gifHeight);
+};
+  x.onerror = function() {
+    console.log("[getGifImage]:", 'Network error.');
+    loader.hidden = true;
+  };
+  x.send();
+
+}
 function getGifImage( searchTerm ){
 
   //Show loading
