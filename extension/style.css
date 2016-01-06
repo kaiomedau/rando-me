@@ -83,7 +83,7 @@ input:focus,select:focus,textarea:focus,button:focus {
         color: #2196d9;
         float: left;
         font-weight: bold;
-        width: 160px;
+        width: 193px;
         font-size: 14px;
       }
       #request_gif{
@@ -155,16 +155,7 @@ input:focus,select:focus,textarea:focus,button:focus {
             .search-term .remove-term:active{
               background-color: #148d50;
             }
-      #rando_logo{
-        width: 20px;
-        height: 20px;
-        display: block;
-        -webkit-mask-image: url(images/rando_logo.svg);
-        mask-image: url(images/rando_logo.svg);
-        float: left;
-        background-color: #38d385;
-        margin:12px 14px 0 0;
-      }
+
       #giphy_logo{
         background: url(images/giphy-logo.png);
         width: 94px;
