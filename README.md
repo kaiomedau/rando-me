@@ -22,7 +22,7 @@ Keep in mind that you can always use the thumbs up button as a shortcut.
 # Overview
 > **Before stating:** rename the  `server/includes/config-example.php` to `server/includes/config.php`.
 
-## Config:
+## Setup:
 The `congif.php` file holds your `Giphy API key` used for making your GIF and search requests.
 
 Please use the `Giphy Public key` - *already inside config.example.php* - while you develop your application and experiment with your integrations.
