@@ -114,6 +114,8 @@ input:focus,select:focus,textarea:focus,button:focus {
       #recent_terms{
         max-height: 30px;
         overflow: hidden;
+        max-width: 284px;
+        float: left;
       }
       .search-term{
         background: #38d385;
@@ -157,10 +159,9 @@ input:focus,select:focus,textarea:focus,button:focus {
             }
 
       #giphy_logo{
-        background: url(images/giphy-logo.png);
-        width: 94px;
-        height: 10px;
-        position: absolute;
-        bottom: 10px;
-        right: 34px;
+        background: url(images/giphy-logo.png) no-repeat 50% 50%;
+        width: 58px;
+        height: 20px;
+        margin: 4px 0 6px 0;
+        float: right;
       }
