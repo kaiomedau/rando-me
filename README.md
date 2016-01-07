@@ -20,7 +20,7 @@ Keep in mind that you can always use the thumbs up button as a shortcut.
 - Right click or Drag and drop interactions
 
 # Overview
-> **Before stating:** rename the  `server/includes/config-example.php` to `server/includes/config.php`.
+> **Before stating:** rename `server/includes/config-example.php` to `server/includes/config.php`.
 
 ## Setup:
 The `congif.php` file holds your `Giphy API key` used for making your GIF and search requests.
