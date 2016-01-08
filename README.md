@@ -29,6 +29,15 @@ Please use the `Giphy Public key` - *already inside config.example.php* - while 
 
 ```$public_giphy_key   = "dc6zaTOxFJmzC";```
 
+## Features:
+- Random GIFs powered by Giphy
+- Thumbs Up shortcut
+- Cross devices history bar
+- Right click or Drag and drop interactions
+
+## Firefox:
+- Depends on `node.js` and npm
+- Install `jpm` with `npm install jpm --global` and `jpm run` on firefox folder.
 
 ----
 
