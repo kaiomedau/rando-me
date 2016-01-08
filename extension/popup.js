@@ -13,8 +13,9 @@ var recent_terms_limit = 5;
 //API commands
 //Used to define what parameters do we need to send to the server
 var commands = {
-   'random' : 'rand',
-   'byid'   : 'gif'
+   'random'     : 'rand',
+   'byid'       : 'gif',
+   'translate'  : 'trans',
 };
 
 //Constants

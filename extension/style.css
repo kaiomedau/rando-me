@@ -74,14 +74,14 @@ footer{
 #wrapper{
   background: url(images/rando_bg.png) no-repeat 50% 50% #34414c;
   text-align: center;
-  padding: 30px;
   color: #506272;
   position: relative;
   min-height: 200px;
+  overflow: auto;
 }
   #gif_img{
     display: block;
-    margin: 0 auto;
+    margin: 30px auto 12px auto;
     border-radius: 4px;
     min-height: 200px;
   }
@@ -102,35 +102,60 @@ footer{
       visibility: hidden;
     }
 
-  #gif_url {
-    white-space: pre;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    display: block;
-    font-size: 10px;
-    padding: 11px 25px;
-    background: #3c4b58;
-    border-radius: 8px;
-    margin-top: 12px;
-    box-shadow: 0px 2px 0px #2f3d48;
+  #git_meta{
+    text-align: left;
+    position: relative;
+    margin-bottom: 14px;
   }
-    #gif_url::selection {
-      background: #da6f6f;
+    #gif_url {
+      white-space: pre;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      display: inline-block;
+      font-size: 10px;
+      padding: 11px 25px;
+      background: #3c4b58;
+      border-radius: 8px;
+      box-shadow: 0px 2px 0px #2f3d48;
+      width: 236px;
+      margin-left: 30px;
     }
+      #gif_url::selection {
+        background: #da6f6f;
+      }
 
-  #love_gif{
-    -webkit-mask-image: url(images/love.svg);
-    background-color: #465664;
-    width: 28px;
-    height: 26px;
-  }
-    #love_gif.loved{
-      background-color: #da6f6f;
+    #love_gif{
+      position: absolute;
+      top: 4px;
+      right: 36px;
+      display: block;
+      width: 28px;
+      height: 26px;
+      -webkit-mask-image: url(images/love.svg);
+      background-color: #465664;
+      margin-left:14px;
     }
-    #love_gif:hover{
-      background-color: #c55757;
-      cursor: pointer;
+      #love_gif.loved{
+        background-color: #da6f6f;
+      }
+      #love_gif:hover{
+        background-color: #c55757;
+        cursor: pointer;
+      }
+
+    #loved_menu_btn{
+      background: url(images/love-menu.png) no-repeat 100% 48%;
+      width: 30px;
+      height:100%;
+      display: inline-block;
+      position: absolute;
+      right: 0;
+      top: 0;
     }
+      #loved_menu_btn:hover{
+        background: url(images/love-menu-hover.png) no-repeat 100% 48%;
+        cursor: pointer;
+      }
 
 /************************
 ******** Footer ********
