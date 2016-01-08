@@ -1,12 +1,46 @@
 
-var api_url_path = "http://baleiabalao.com/_apps/rando/?gif=";
-var recent_terms_limit = 5; // Limit search terms to store
-var recent_terms_array = new Array(); //Array to handle the recent terms
+//*************************************************
+//*************** Define API Path
+//*************************************************
+var API_PATH = "http://baleiabalao.com/_apps/rando/";
 
-var consts = {
-  recent_term_prefix: "rt_",
-  recent_term_button_prefix: "brt_",
+// Limit the history terms
+// The actual UI can take 5 short terms
+var recent_terms_limit = 5;
+
+
+
+//API commands
+//Used to define what parameters do we need to send to the server
+var commands = {
+   'random' : 'rand',
+   'byid'   : 'gif'
 };
+
+//Constants
+var consts = {
+  'recent_term_prefix': 'rt_',
+  'recent_term_button_prefix': 'brt_',
+};
+
+//Array to handle the recent terms
+var recent_terms_array = new Array();
+
+
+/* get_api_url
+//Receive the command key and a second parameter - can be a search term or a gifID
+//Return the final url ready to use
+*/
+function get_api_url( cmd , param ){
+  switch(cmd) {
+    case "gif":
+    return API_PATH + "?cmd=gif&id=" + param;
+        break;
+    case "rand":
+    default:
+      return API_PATH + "?cmd=rand&gif=" + param;
+  }
+}
 
 
 //As soon DOM complete loading, add all primary event listeners
@@ -30,14 +64,22 @@ document.addEventListener('DOMContentLoaded', function() {
     //Add the action to the thumbs up button
     var thumbs = document.getElementById('thumbs_up');
     thumbs.addEventListener('click', function() {
-        requestGif('thumbs up',false);
+        requestRandomGif('thumbs up',false);
     });
+
+
+    var love = document.getElementById('love_gif');
+    love.addEventListener('click', function() {
+        requestGifByID('feqkVgjJpYtjy');
+    });
+
+
 
     //Displays the recent tems
     populateRecentSeachTerms();
 
     //Make a initial search
-    requestGif('dancing',false);
+    requestRandomGif('dancing',false);
 
 });
 
@@ -156,7 +198,6 @@ function removeRecentSearchTerm(term){
 }
 
 
-
 function handleSearchTerms(term){
   term = term.toLowerCase();
 
@@ -204,29 +245,41 @@ function handleSearchTerms(term){
 function handleSearchClick(){
   var term = document.getElementById('search_term').value;
   if(term.length){
-    requestGif( term, true);
+    requestRandomGif( term, true);
   }
 }
 
-function requestGif(term, store_as_recent_term){
+function requestRandomGif( term, store_as_recent_term ){
   if(!term){ return; }
 
   //Ask the server for a GIF
-  requestGifFromServer( term );
+  requestGifFromServer( commands.random , term );
 
   //Save as recent term
   if(store_as_recent_term){
     handleSearchTerms(term);
   }
-
 }
 
-function requestGifFromServer( searchTerm ){
-  console.log( "[getGifImage]:", "Requesting GIF for:", searchTerm );
+function requestGifByID( gifID ){
+  if(!gifID){ return; }
+
+  //Ask the server for a GIF
+  requestGifFromServer( commands.byid , gifID );
+}
+
+
+
+
+
+
+function requestGifFromServer( cmd , param ){
+  console.log( "[getGifImage]:", "Requesting GIF for:", param );
 
   changeLoaderVisibility(false); //Show loading
 
-  var searchUrl = api_url_path + encodeURIComponent(searchTerm);
+  var searchUrl = get_api_url( cmd , encodeURIComponent(param) );
+  // api_url_path + encodeURIComponent(searchTerm);
   var x = new XMLHttpRequest(); //Create the request
   x.open('GET', searchUrl);
   x.responseType = 'json';
@@ -244,6 +297,8 @@ function requestGifFromServer( searchTerm ){
     console.log( "[requestGifFromServer]:", "No response");
     return;
   }
+
+  console.log(response);
 
   //Response GIF data
   var gifURL    = response.data.url;
@@ -285,3 +340,13 @@ function changeLoaderVisibility( hide_loader ){
 
   gifContainer.hidden = false;// = hide_loader ? false : true;
 }
+
+
+//**********************************
+//          Loving GIFs
+//**********************************
+//Get loved GIFs
+//Check if GIF is loved
+//Add love to GIF
+//Remove love from GIF
+//Display loved GIF

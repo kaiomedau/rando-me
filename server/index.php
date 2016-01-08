@@ -16,18 +16,38 @@ if(!file_exists("$path/config.php")){
 */
 require_once("$path/config.php");
 
-$searchTerm = $_GET["gif"];
-$searchTerm = str_replace(" ", "+", $searchTerm);
-
-$apiPATH    = "http://api.giphy.com/v1/gifs/random?api_key=$apiKEY&tag=$searchTerm";
+/*
+    Commands will define what API address will be called
+*/
+$apiPATH;
+$command = $_GET["cmd"];
+switch ($command) {
+    case 'gif':
+        $requestID = $_GET["id"];
+        $apiPATH = "http://api.giphy.com/v1/gifs/$requestID?api_key=$apiKEY";
+        break;
+    case 'rand':
+    default:
+        $searchTerm = str_replace(" ", "+", $_GET["gif"] );
+        $apiPATH = "http://api.giphy.com/v1/gifs/random?api_key=$apiKEY&tag=$searchTerm";
+        break;
+}
 
 $response   = file_get_contents($apiPATH);
 $json       = json_decode($response);
 
-$imgSRC     = $json->{'data'}->{'image_original_url'};
-$imgWidth   = $json->{'data'}->{'image_width'};
-$imgHeight  = $json->{'data'}->{'image_height'};
+if($json->{'data'}->{'images'}){
+    $imgSRC     = $json->{'data'}->{'images'}->{'downsized'}->{'url'};
+    $imgWidth   = $json->{'data'}->{'images'}->{'downsized'}->{'width'};
+    $imgHeight  = $json->{'data'}->{'images'}->{'downsized'}->{'height'};
+}else{
+    $imgSRC     = $json->{'data'}->{'image_url'};//{'image_original_url'};
+    $imgWidth   = $json->{'data'}->{'image_width'};
+    $imgHeight  = $json->{'data'}->{'image_height'};
+}
 
-echo json_encode( array("data" => array( "url"=> $imgSRC , "width" => $imgWidth, "height" => $imgHeight) ) );
+$imgID = $json->{'data'}->{'id'};
+
+echo json_encode( array("data" => array( "id"=> $imgID, "url"=> $imgSRC , "width" => $imgWidth, "height" => $imgHeight , "giphy"=>$json->{'data'}) ) );
 
 ?>
