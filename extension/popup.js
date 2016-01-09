@@ -43,10 +43,11 @@ var recent_terms_array = new Array();
 document.addEventListener('DOMContentLoaded', function() {
 
     //Add the action to the search button
-    var search_btn = document.getElementById( RandME.ui.search_btn );
-    search_btn.addEventListener('click', function() {
+    listener.click( RandME.ui.search_btn, function() {
         handleSearchClick();
     });
+
+
 
     //Add the action to the search field when the ENTER key is pressed
     var search_field = document.getElementById( RandME.ui.search_textfield );
@@ -57,16 +58,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     //Add the action to the thumbs up button
-    var thumbs = document.getElementById( RandME.ui.thumbs_up_btn );
-    thumbs.addEventListener('click', function() {
+    listener.click( RandME.ui.thumbs_up_btn, function() {
         requestRandomGif('thumbs up',false);
     });
 
 
-    var love = document.getElementById( RandME.ui.love_btn );
-    love.addEventListener('click', function() {
+
+    listener.click( RandME.ui.love_btn, function() {
         requestGifByID('feqkVgjJpYtjy');
     });
+
 
 
     //Displays the recent tems
@@ -129,38 +130,41 @@ function populateRecentSeachTerms(){
 }
 
 
+
+
+
+//**********************************
+//          RECENTS BAR
+//**********************************
 function handleRecentTermsListeners(){
-  if(!recent_terms_array || !recent_terms_array.length){
-    return;
-  }
+  if(!recent_terms_array || !recent_terms_array.length){ return; }
 
   //Loop to get all Buttons and add the listeners to it
   for (var i = 0; i < recent_terms_array.length; i++) {
 
-    var obj = termSlug( recent_terms_array[i] , RandME.constants.recent_term_prefix );
-    document.getElementById( obj ).addEventListener('click', function() {
+    //Search button
+    var objID = termSlug( recent_terms_array[i] , RandME.constants.recent_term_prefix );
+    listener.click( objID, function() {
       document.getElementById( RandME.ui.search_textfield ).value = this.innerHTML;
       handleSearchClick();
     });
 
-    var btObj = termSlug( recent_terms_array[i] , RandME.constants.recent_term_button_prefix );
-    document.getElementById( btObj ).addEventListener('click', function() {
+    //Remove searchterm from bar
+    var removeBtnID = termSlug( recent_terms_array[i] , RandME.constants.recent_term_button_prefix );
+    listener.click( removeBtnID, function() {
 
-      var objID = this.id;
-          objID = objID.replace( RandME.constants.recent_term_button_prefix, RandME.constants.recent_term_prefix );
+      var thisID = this.id.replace( RandME.constants.recent_term_button_prefix, RandME.constants.recent_term_prefix );
+      var searchTerm  = document.getElementById( thisID ).innerHTML;
 
-      var term  = document.getElementById( objID ).innerHTML;
-
-      removeRecentSearchTerm( term );
+      //Remove serachterm
+      removeRecentSearchTerm( searchTerm );
 
     });
 
   };
-
  }
 
-//Remove a speific recent term
-//triggered by the recent term X button
+//Remove a speific recent term //triggered by the recent term X button
 function removeRecentSearchTerm(term){
   term = term.toLowerCase();
   console.log("[removeRecentSearchTerm]:", "Term to remove:",term)
@@ -185,6 +189,7 @@ function removeRecentSearchTerm(term){
     }
 
     populateRecentSeachTerms();
+
   });
 
 }
@@ -236,6 +241,11 @@ function handleSearchClick(){
 
 
 
+
+
+
+
+
 //**********************************
 //               UI
 //**********************************
@@ -263,6 +273,13 @@ function changeLoaderVisibility( hide_loader ){
 
   gifContainer.hidden = false;// = hide_loader ? false : true;
 }
+
+
+
+
+
+
+
 
 
 
@@ -369,8 +386,13 @@ storage.remove = function(key){
   chrome.storage.sync.remove( [key] );
 }
 
-
-
+//**********************************
+//         LISTENER HELPER
+//**********************************
+function listener(){}
+listener.click = function( objID, callback ){
+  document.getElementById( [objID] ).addEventListener( 'click', callback );
+}
 
 
 
