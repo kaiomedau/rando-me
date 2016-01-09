@@ -30,7 +30,7 @@ footer{
 /************************
 ******** Header ********
 ************************/
-  #search_term{
+  #search_textfield{
     background: #1f2b35;
     border: none;
     border-radius: 8px 0 0 8px;
@@ -43,7 +43,7 @@ footer{
     width: 193px;
     font-size: 14px;
   }
-  #request_gif{
+  #serach_btn{
     background: url(images/magnifying.png) no-repeat 50% 50% #38d385;
     border: none;
     border-radius: 0 8px 8px 0;
@@ -51,7 +51,7 @@ footer{
     height: 42px;
     float: left;
   }
-    #request_gif:hover{
+    #serach_btn:hover{
       background-color: #d92196;
     }
   #thumbs_up{
