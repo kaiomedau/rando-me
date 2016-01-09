@@ -68,10 +68,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
-    var love = document.getElementById('love_gif');
-    love.addEventListener('click', function() {
-        requestGifByID('feqkVgjJpYtjy');
-    });
+    // var love = document.getElementById('love_gif');
+    // love.addEventListener('click', function() {
+    //     requestGifByID('feqkVgjJpYtjy');
+    // });
 
 
 
