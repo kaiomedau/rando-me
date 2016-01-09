@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
-
     //Displays the recent tems
     populateRecentSeachTerms();
 
@@ -96,19 +95,11 @@ function searchTermToHTML( term ){
   return "<div class='search-term'><div class='term' id='"+ slug +"'>"+term+"</div><button class='remove-term' id='" + btnSlug + "''>x</button></div>";
 }
 
-//Erase all recent terms from Sync and Local
-function clearRecentsStorage(){
-  chrome.storage.sync.remove( [RandME.keys.recent] );
-}
+
 
 function populateRecentSeachTerms(){
 
-  //******* Used for debug
-  // clearRecentsStorage();
-  // return;
-  //******* END Used for debug
-
-  chrome.storage.sync.get( RandME.keys.recent, function( items ) {
+  storage.get( RandME.keys.recent, function( items ) {
 
     //Check if has any recent terms
     if( !items || !items[RandME.keys.recent] ){
@@ -129,6 +120,7 @@ function populateRecentSeachTerms(){
 
     //Store the recent terms to create the recent buttons actions
     recent_terms_array = rt;
+
     //Add the necessary actions to all recent buttons
     handleRecentTermsListeners();
 
@@ -173,20 +165,20 @@ function removeRecentSearchTerm(term){
   term = term.toLowerCase();
   console.log("[removeRecentSearchTerm]:", "Term to remove:",term)
 
-  chrome.storage.sync.get( RandME.keys.recent, function( items ) {
+  storage.get( RandME.keys.recent, function( items ) {
     if(!items || !items[RandME.keys.recent]){
       console.log("[removeRecentSearchTerm]:", "History not found");
       return;
     }
 
     var rt = items[RandME.keys.recent];
-    var rtIndex = rt.indexOf(term);
+    var index = rt.indexOf( term );
 
-    if(rtIndex > -1){
+    if(index > -1){
 
-      rt.splice(rtIndex, 1); //Remove term
+      rt.splice(index, 1); //Remove term
 
-      chrome.storage.sync.set( { [RandME.keys.recent] : rt } , function() {
+      storage.set( RandME.keys.recent, rt , function() {
           console.log( "[removeRecentSearchTerm]:","Term removed:",term );
       });
 
@@ -198,47 +190,40 @@ function removeRecentSearchTerm(term){
 }
 
 
+
+
+
+
+
+
+
+
 function handleSearchTerms(term){
   term = term.toLowerCase();
 
-  chrome.storage.sync.get( RandME.keys.recent , function( items ) {
+  storage.get( RandME.keys.recent , function( items ) {
 
-    var recent_terms = items[RandME.keys.recent];
+    var rt = items[RandME.keys.recent] || new Array();
+    if(rt.length >= RandME.configs.recents_limit){
+      rt.pop();
+    }
 
-    if(recent_terms){
-      //Já temos termos de busca salvos.
-      console.log("ja temos termos salvos", items);
-      console.log("Termo buscado:",term);
+    //Check if term already exists
+    if(rt.indexOf( term ) == -1){
+      //Add recent term
+      rt.unshift( term );
 
-      if(recent_terms.indexOf(term) == -1){
-
-        if(recent_terms.length >= RandME.configs.recents_limit){
-          recent_terms.pop();
-        }
-
-        recent_terms.unshift(term);
-
-        chrome.storage.sync.set({ [RandME.keys.recent] : recent_terms}, function() {
-          console.log( "Term saved",recent_terms );
-        });
-
-      }
-
-    }else{
-
-      console.log("[handleSearchTerms]:","No recent terms found yet");
-
-      recent_terms = new Array(term);
-      chrome.storage.sync.set({ [RandME.keys.recent] : recent_terms}, function() {
-        console.log( "[handleSearchTerms]:", "Recent storage created", recent_terms );
+      //Save recents
+      storage.set( RandME.keys.recent, rt, function() {
+        console.log( "Term saved", rt );
       });
 
+    }else{
+      console.log("termo já existe");
     }
 
     populateRecentSeachTerms();
-
   });
-
 }
 
 //Get the search term and request the GIF
@@ -370,7 +355,19 @@ function get_api_url( cmd , param ){
 
 
 
-
+//**********************************
+//             STORAGE
+//**********************************
+function storage(){}
+storage.get = function( key, callback ){
+  chrome.storage.sync.get( [key] , callback );
+}
+storage.set = function( key, data, callback ){
+  chrome.storage.sync.set( { [key] : data }, callback );
+}
+storage.remove = function(key){
+  chrome.storage.sync.remove( [key] );
+}
 
 
 
