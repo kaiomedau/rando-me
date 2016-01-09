@@ -44,14 +44,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //Add the action to the search button
     listener.click( RandME.ui.search_btn, function() {
-        handleSearchClick();
+      handleSearchClick();
     });
 
-
-
-    //Add the action to the search field when the ENTER key is pressed
-    var search_field = document.getElementById( RandME.ui.search_textfield );
-    search_field.addEventListener('keypress', function(e) {
+    //
+    listener.keypress( RandME.ui.search_textfield, function(e) {
       if (e.keyCode == '13') {
         handleSearchClick();
       }
@@ -59,15 +56,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     //Add the action to the thumbs up button
     listener.click( RandME.ui.thumbs_up_btn, function() {
-        requestRandomGif('thumbs up',false);
+      requestRandomGif('thumbs up',false);
     });
-
 
 
     listener.click( RandME.ui.love_btn, function() {
-        requestGifByID('feqkVgjJpYtjy');
+      requestGifByID('feqkVgjJpYtjy');
     });
-
 
 
     //Displays the recent tems
@@ -393,7 +388,9 @@ function listener(){}
 listener.click = function( objID, callback ){
   document.getElementById( [objID] ).addEventListener( 'click', callback );
 }
-
+listener.keypress = function ( objID, callback ){
+  document.getElementById( [objID] ).addEventListener( 'keypress', callback );
+}
 
 
 
