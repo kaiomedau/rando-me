@@ -1,5 +1,5 @@
 <p align="center">
-   <img src="https://raw.githubusercontent.com/kaiomedau/rando-me/master/layout/Chrome-Store/store_rando_tile_440.png" alt="Rando.me a GIF" /><br/>
+   <img src="https://raw.githubusercontent.com/kaiomedau/rando-me/master/google-chrome/layout/Chrome-Store/store_rando_tile_440.png" alt="Rando.me a GIF" /><br/>
    <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg" />
 </p>
 
