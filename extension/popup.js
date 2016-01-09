@@ -1,4 +1,3 @@
-
 //*************************************************
 //*************** Configurations
 //*************************************************
@@ -15,7 +14,8 @@ var RandME = {
     translate  : 'trans', //Return a GIF translating the search term
   },
   keys : {
-    recent     : 'recent',
+    recent      : 'recent',
+    loved       : 'loved',
   },
   constants : {
     recent_term_prefix        : 'rt_',
@@ -41,37 +41,51 @@ var recent_terms_array = new Array();
 //As soon DOM complete loading, add all primary event listeners
 //Also populates the recent terms and make a initial search to present a random gif
 document.addEventListener('DOMContentLoaded', function() {
-
-    //Add the action to the search button
-    listener.click( RandME.ui.search_btn, function() {
-      handleSearchClick();
-    });
-
-    //
-    listener.keypress( RandME.ui.search_textfield, function(e) {
-      if (e.keyCode == '13') {
-        handleSearchClick();
-      }
-    });
-
-    //Add the action to the thumbs up button
-    listener.click( RandME.ui.thumbs_up_btn, function() {
-      requestRandomGif('thumbs up',false);
-    });
-
-
-    listener.click( RandME.ui.love_btn, function() {
-      requestGifByID('feqkVgjJpYtjy');
-    });
-
-
-    //Displays the recent tems
-    populateRecentSeachTerms();
-
-    //Make a initial search
-    requestRandomGif('dancing',false);
-
+  //Init Rando
+  RandoInit();
 });
+
+
+//**********************************
+//        INITIAL Actions
+//**********************************
+function RandoInit(){
+
+  RandoInitialListeners();
+
+  //Displays the recent tems
+  populateRecentSeachTerms();
+
+  //Make a initial search
+  requestRandomGif('dancing',false);
+}
+
+function RandoInitialListeners(){
+  //Add the action to the search button
+  listener.click( RandME.ui.search_btn, function() {
+    handleSearchClick();
+  });
+
+  //
+  listener.keypress( RandME.ui.search_textfield, function(e) {
+    if (e.keyCode == '13') {
+      handleSearchClick();
+    }
+  });
+
+  //Add the action to the thumbs up button
+  listener.click( RandME.ui.thumbs_up_btn, function() {
+    requestRandomGif('thumbs up',false);
+  });
+
+  listener.click( RandME.ui.love_btn, function() {
+    requestGifByID('feqkVgjJpYtjy');
+  });
+
+  // love.add('feqkVgjJpYtjy');
+  love.list();
+
+}
 
 //**********************************
 //      RECENT SEARCH TERMS
@@ -90,8 +104,6 @@ function searchTermToHTML( term ){
   var btnSlug = termSlug(term, RandME.constants.recent_term_button_prefix);
   return "<div class='search-term'><div class='term' id='"+ slug +"'>"+term+"</div><button class='remove-term' id='" + btnSlug + "''>x</button></div>";
 }
-
-
 
 function populateRecentSeachTerms(){
 
@@ -121,8 +133,9 @@ function populateRecentSeachTerms(){
     handleRecentTermsListeners();
 
   });
-
 }
+
+
 
 
 
@@ -195,9 +208,9 @@ function removeRecentSearchTerm(term){
 
 
 
-
-
-
+//**********************************
+//         SEARCH ACTIONS
+//**********************************
 function handleSearchTerms(term){
   term = term.toLowerCase();
 
@@ -267,6 +280,7 @@ function changeLoaderVisibility( hide_loader ){
   loaderContainer.className = hide_loader ? "hidden" : "";
 
   gifContainer.hidden = false;// = hide_loader ? false : true;
+
 }
 
 
@@ -318,30 +332,31 @@ function requestGifFromServer( cmd , param ){
   x.open('GET', get_api_url( cmd , encodeURIComponent(param) ) );
   x.responseType = 'json';
   x.onload = function() {
+    var response = x.response;
+    if(response){
 
-  var response = x.response;
-  if(response){
-    if(response.error){
-      console.log( "[requestGifFromServer]:", "ERROR:", response.message);
+      if(response.error){
+        console.log( "[requestGifFromServer]:", "ERROR:", response.message);
+        return;
+      }else if (!response.data) {
+        console.log( "[requestGifFromServer]:", "Response contains NO DATA");
+      };
+
+    }else{
+      console.log( "[requestGifFromServer]:", "No response");
       return;
-    }else if (!response.data) {
-      console.log( "[requestGifFromServer]:", "Response contains NO DATA");
-    };
-  }else{
-    console.log( "[requestGifFromServer]:", "No response");
-    return;
-  }
+    }
 
-  console.log(response);
+    console.log(response);
 
-  //Response GIF data
-  var gifURL    = response.data.url;
-  var gifWidth  = response.data.width;
-  var gifHeight = response.data.height;
+    //Response GIF data
+    var gifURL    = response.data.url;
+    var gifWidth  = response.data.width;
+    var gifHeight = response.data.height;
 
-  //Display final GIF
-  renderGifResponse(gifURL,gifWidth,gifHeight);
-};
+    //Display final GIF
+    renderGifResponse(gifURL,gifWidth,gifHeight);
+  };
   x.onerror = function() {
     console.log("[getGifImage]:", 'Network error.');
     loader.hidden = true;
@@ -394,10 +409,6 @@ listener.keypress = function ( objID, callback ){
 
 
 
-
-
-
-
 //**********************************
 //          Loving GIFs
 //**********************************
@@ -406,3 +417,52 @@ listener.keypress = function ( objID, callback ){
 //Add love to GIF
 //Remove love from GIF
 //Display loved GIF
+function love(){}
+love.set = function( data, callback ){
+  storage.set( RandME.keys.loved, data, callback ? callback : function() {
+    console.log( "[love.set]", "Success", data);
+  });
+}
+love.add = function( gifID ){
+  storage.get( RandME.keys.loved , function( items ){
+
+    var lvd = items[RandME.keys.loved] || new Array();
+    if( lvd.indexOf( gifID ) == -1 ){
+
+      //Add gifID to the set
+      lvd.unshift( gifID );
+
+      //Save set
+      love.set( lvd );
+
+    }else{
+      console.log( "[love.add]", "FAIL", "ID already exists" );
+    }
+
+  });
+}
+love.remove = function( gifID ){
+  storage.get( RandME.keys.loved , function( items ){
+
+    var lvd = items[RandME.keys.loved] || new Array();
+    var index = lvd.indexOf( gifID );
+    if( index > -1 ){
+
+      //Remove gifID from set
+      lvd.splice(index, 1);
+
+      //Save new SET
+      love.set( lvd );
+
+    }else{
+      console.log( "[love.remove]", "FAIL", "ID does not exist" );
+    }
+
+  });
+}
+love.list = function( callback ){
+  storage.get( RandME.keys.loved , function( items ){
+    var lvd = items[RandME.keys.loved];
+    console.log( "[love.list]",  lvd );
+  });
+}
