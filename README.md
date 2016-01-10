@@ -36,7 +36,9 @@ The `congif.php` file holds your `Giphy API key` used to make your `GIF` and `se
 
 Please use the `Giphy Public key` - *already inside config.example.php* - while you develop your application and experiment with your integrations.
 
-```$public_giphy_key   = "dc6zaTOxFJmzC";```
+```
+$public_giphy_key   = "dc6zaTOxFJmzC";
+```
 
 
 ### Extension Setup:
@@ -44,7 +46,7 @@ All customizable data is kept inside `RandME` object.
 > **Note:** you will not need to change anything else inside popup.js. All requests will make reference to `RandME` and its keys.
 
 ```
-<pre>var RandME = {
+var RandME = {
   configs : {
     debugging         : true,                   //Set this to false to stop console logs
     recents_limit     : 5,                      //Limit the history terms
@@ -83,7 +85,7 @@ All customizable data is kept inside `RandME` object.
     loading             : 'loading',
   }
 }
-</pre>```
+```
 
 > Replace RandMe.configs.**{api_path}** with your server URL
 Feel free to keep the default address `while you develop` your application.
