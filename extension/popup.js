@@ -337,17 +337,22 @@ function get_api_url( cmd , param ){
 }
 
 
-
+//**********************************
+//         ELEMENT HELPER
+//**********************************
+function element( objID ){
+  return document.getElementById( [objID] );
+}
 
 //**********************************
 //         LISTENER HELPER
 //**********************************
 function listener(){}
 listener.click = function( objID, callback ){
-  document.getElementById( [objID] ).addEventListener( 'click', callback );
+  element( objID ).addEventListener( 'click', callback );
 }
 listener.keypress = function ( objID, callback ){
-  document.getElementById( [objID] ).addEventListener( 'keypress', callback );
+  element( objID ).addEventListener( 'keypress', callback );
 }
 
 //**********************************
