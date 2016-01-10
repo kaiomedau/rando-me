@@ -14,23 +14,76 @@ Start adding GIFs to your messages, emails, Facebook, Twitter or to whatever too
 Keep in mind that you can always use the thumbs up button as a shortcut.
 
 ## Features:
-- Random GIFs powered by Giphy
-- Thumbs Up shortcut
-- Cross devices history bar
-- Right click or Drag and drop interactions
+- Request random GIFs by `search term`
+- Request specific GIFs `by ID`
+- Request a `translation` GIF - Translates a keyword into image eg.: "NO" will return a random GIF of someone saying "NO"
+- Store `recent search` terms
+- Store `loved GIFs`
+
 
 # Overview
-> **Before stating:** rename `server/includes/config-example.php` to `server/includes/config.php`.
+Everithing is pretty much ready to run.
+You will only need to:
+- Rename the `config.example.php`
+- Upload the contents of `server folder` to your server
+- Inform the `popup.js` the final API address
 
-## Setup:
-### Server:
+
+## Server Setup:
 The `congif.php` file holds your `Giphy API key` used for making your GIF and search requests.
+> **Note:** rename `server/includes/config-example.php` to `server/includes/config.php`.
 
 Please use the `Giphy Public key` - *already inside config.example.php* - while you develop your application and experiment with your integrations.
 
 ```$public_giphy_key   = "dc6zaTOxFJmzC";```
 
-### Extension
+
+### Extension Setup:
+All customizable data is kept inside `RandME` object.
+> **Note:** you will not need to change anything else inside popup.js. All requests will make reference to `RandME`.
+
+```var RandME = {
+  configs : {
+    debugging         : true,                   //Set this to false to stop console logs
+    recents_limit     : 5,                      //Limit the history terms
+    initial_serach    : "Dance",                //Initial keyword
+    no_gif_message    : "No GIFs found :(",     //Mesage for GIFs not found
+    api_path          : "http://YOUR-SERVER",   //Server address
+  },
+  commands : {
+    random     : 'rand',  //Return a random GIF for a keyword
+    byID       : 'byid',  //Return a specific GIF
+    translate  : 'trans', //Return a GIF translating the search term
+  },
+  keys : { //Used to store data localy and sync it
+    recent      : 'recent', //Used to display the recent seach terms
+    loved       : 'loved',  //Used to display the loved GIFs
+    last        : 'last',   //Used to recover the last GIF loaded
+  },
+  constants : { //Used to build and request UI elements
+    recent_term_prefix        : 'rt_',
+    recent_term_button_prefix : 'brt_',
+    loved_class               : 'loved',
+    opened_class              : 'open',
+    visible_class             : 'visible',
+  },
+  ui : { //IDs from your HTML.
+    main                : 'main',
+    hit                 : 'hit',
+    search_btn          : 'serach_btn',
+    search_textfield    : 'search_textfield',
+    thumbs_up_btn       : 'thumbs_up',
+    love_btn            : 'love_gif',
+    love_menu_btn       : 'loved_menu_btn',
+    recent_terms        : 'recent_terms',
+    gif_url             : 'gif_url',
+    gif_img             : 'gif_img',
+    loading             : 'loading',
+  }
+}```
+
+> Replace RandMe.configs.**{api_path}** with your server URL
+Feel free to keep the default address `while you develop` your application.
 
 
 ----
