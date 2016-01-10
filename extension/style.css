@@ -4,10 +4,11 @@ input:focus,select:focus,textarea:focus,button:focus {
 body {
   font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
   font-size: 100%;
-  background: #34414c;
+  background: #23303a;
   width: 400px;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 img{
   height: auto;
@@ -27,6 +28,20 @@ header{
 footer{
   border-bottom: solid 3px #38d385;
 }
+/************************
+******** MAIN ********
+************************/
+#main{
+  position: relative;
+  background: #34414c;
+  overflow: hidden;
+  width: 400px;
+
+  transition: margin-left 200ms;
+}
+  #main.open{
+    margin-left: -160px;
+  }
 /************************
 ******** Header ********
 ************************/
@@ -157,6 +172,7 @@ footer{
         cursor: pointer;
       }
 
+
 /************************
 ******** Footer ********
 ************************/
@@ -215,3 +231,33 @@ footer{
         float: right;
       }
 
+/**************************
+******** Loved Bar ********
+**************************/
+#loved_bar{
+  background: rgba( 0,0,0,.5 );
+  position: absolute;
+  top: 0;
+  right: -20px;
+  width: 180px; /*Hack to hide the scrollbar*/
+  height: 100%;
+
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+  #loved_gifs{
+    width: 160px;
+    text-align: center;
+  }
+    #loved_gifs .loved_gif img{
+      max-width: 140px;
+      /*max-height: 80px;*/
+      /*margin-top: 20px;*/
+      margin: 5px auto;
+    }
+      #loved_gifs .loved_gif:first-child img{
+        margin-top: 10px;
+      }
+      #loved_gifs .loved_gif:last-child img{
+        margin-bottom: 10px;
+      }

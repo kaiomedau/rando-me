@@ -21,12 +21,15 @@ var RandME = {
   constants : {
     recent_term_prefix        : 'rt_',
     recent_term_button_prefix : 'brt_',
+    loved_class               : 'loved',
   },
   ui : {
+    main                : 'main',
     search_btn          : 'serach_btn',
     search_textfield    : 'search_textfield',
     thumbs_up_btn       : 'thumbs_up',
     love_btn            : 'love_gif',
+    love_menu_btn       : 'loved_menu_btn',
     recent_terms        : 'recent_terms',
     gif_url             : 'gif_url',
     gif_img             : 'gif_img',
@@ -74,12 +77,15 @@ function RandoInitialListeners(){
     requestRandomGif('thumbs up',false);
   });
 
+
   listener.click( RandME.ui.love_btn, function() {
-    requestGifByID('feqkVgjJpYtjy');
+    loveUiHandle.change( this );
   });
 
-  // love.add('feqkVgjJpYtjy');
-  // love.list();
+  listener.click( RandME.ui.love_menu_btn, function(){
+    var c = element( RandME.ui.main ).className;
+    element( RandME.ui.main ).className = c ? "" : "open";
+  });
 }
 
 
@@ -153,11 +159,6 @@ function removeRecentSearchTerm( term ){
 
 
 
-
-
-
-
-
 //**********************************
 //         SEARCH ACTIONS
 //**********************************
@@ -175,10 +176,22 @@ function handleSearch(){
   }
 }
 
-
 //**********************************
 //               UI
 //**********************************
+
+
+
+
+
+
+
+
+
+
+
+
+
 //Deal with loader visibility
 var loader = (function () {
   return {
@@ -193,15 +206,19 @@ var loader = (function () {
   }
 }());
 //Add the result image to UI
-function renderGifResponse(gifURL, gifWidth, gifHeight) {
+function renderGifResponse( response ) {
+
+  loveUiHandle( response.id );
+
+  var gifURL = response.url;
   var status = gifURL ? gifURL : RandME.configs.no_gif_message;
   element( RandME.ui.gif_url ).textContent = status;
 
   var imageResult       = element( RandME.ui.gif_img );
   imageResult.src       = "";
   imageResult.src       = gifURL ? gifURL : "images/sad-face.png";
-  imageResult.width     = gifURL ? gifWidth : 335;
-  imageResult.height    = gifURL ? gifHeight : 180;
+  imageResult.width     = gifURL ? response.width   : 335;
+  imageResult.height    = gifURL ? response.height  : 180;
 
   loader.hide();
 }
@@ -211,7 +228,7 @@ function renderGifResponse(gifURL, gifWidth, gifHeight) {
 
 
 //**********************************
-//              API
+//            REQUESTS
 //**********************************
 /*
   Request a random GIF
@@ -225,7 +242,6 @@ function requestRandomGif( term, save_term ){
     handleSearchTerms(term);
   }
 }
-
 /*
   Request an specific GIF from server
 */
@@ -233,8 +249,27 @@ function requestGifByID( gifID ){
   if(!gifID){return;}
   requestGifFromServer( RandME.commands.byID , gifID ); //Call server
 }
+/*
+  Make the final server request
+  * Receive a command (cmd) and a param (ID, search term)
+  ** Once the server responds, render the rreceived image
+*/
+function requestGifFromServer( cmd , param ){
+  debug.log( "[getGifImage]:", "Requesting GIF for:", param );
 
+  loader.show(); //Show loading
 
+  api( cmd, param, function( response ){
+    renderGifResponse( response.data ); //Display final GIF
+    debug.log("[requestGifFromServer]", "RESPONSE:", response);
+  } , function(){
+    loader.hide();
+  });
+}
+
+//**********************************
+//              API
+//**********************************
 function api( cmd, param, success, fail ){
 
   var x = new XMLHttpRequest();
@@ -273,31 +308,6 @@ api.url = function(cmd, param){
       return RandME.configs.api_path + "?cmd="+RandME.commands.random+"&gif=" + param;
   }
 }
-
-/*
-  Make the final server request
-  * Receive a command (cmd) and a param (ID, search term)
-  ** Once the server responds, render the rreceived image
-*/
-function requestGifFromServer( cmd , param ){
-  debug.log( "[getGifImage]:", "Requesting GIF for:", param );
-
-  loader.show(); //Show loading
-
-  api( cmd, param, function( response ){
-
-    var d = response.data; //Response GIF data
-    renderGifResponse( d.url, d.width, d.height ); //Display final GIF
-    debug.log("[requestGifFromServer]", "RESPONSE:", response);
-
-  } , function(){
-    loader.hide();
-  });
-}
-
-
-
-
 
 //**********************************
 //         ELEMENT HELPER
@@ -338,7 +348,7 @@ storage.remove = function(key){
 function recent(){};
 recent.set = function( data, callback ){
   storage.set( RandME.keys.recent, data, callback ? callback : function() {
-    debug.log( "[recent.set]", "Success", data);
+    debug.log( "[recent.set]", "SUCCESS", data);
   });
 }
 recent.list = function( callback ){
@@ -367,10 +377,7 @@ recent.add = function( term, callback ){
       //Replace set
       recent.set( rt , callback );
 
-    }else{
-      debug.warn("[recent.add]:", "FAIL:", "Search term already exists");
-    }
-
+    }else{ debug.warn("[recent.add]:", "FAIL:", "Search term already exists"); }
   });
 }
 recent.remove = function( term, callback ){
@@ -391,20 +398,41 @@ recent.remove = function( term, callback ){
       //Replace set
       recent.set( rt , callback );
 
-    }else{
-      debug.error("[recent.remove]", "FAIL:", "Search term not found");
-    }
+    }else{ debug.error("[recent.remove]", "FAIL:", "Search term not found"); }
   });
 }
 
 //**********************************
 //          Loving GIFs
 //**********************************
+function loveUiHandle( gifID ){
+  love.loved( gifID, function(){
+    debug.log("[loveHandle]", "GIF LOVED", gifID);
+    element( RandME.ui.love_btn ).className = RandME.constants.loved_class + " " + gifID;
+  }, function(){
+    debug.log("[loveHandle]", "GIF NOT LOVED", gifID);
+    element( RandME.ui.love_btn ).className = gifID;
+  });
+}
+loveUiHandle.change = function( obj ){
+  var c = obj.className.split(" ");
+  if(c.indexOf( RandME.constants.loved_class ) > -1){
+    obj.className = c[1];
+    love.remove( c[1] );
+  }else{
+    love.add( c[0] );
+    obj.className = RandME.constants.loved_class + " " + c[0];
+  }
+}
 //Get loved GIFs
 //Check if GIF is loved
 //Add love to GIF
 //Remove love from GIF
 //Display loved GIF
+
+//**********************************
+//          Love Helper
+//**********************************
 function love(){}
 love.set = function( data, callback ){
   storage.set( RandME.keys.loved, data, callback ? callback : function() {
@@ -426,10 +454,7 @@ love.add = function( gifID ){
       //Save set
       love.set( lvd );
 
-    }else{
-      debug.error( "[love.add]", "FAIL:", "ID already exists" );
-    }
-
+    }else{ debug.warn( "[love.add]", "FAIL:", "ID already exists" ); }
   });
 }
 love.remove = function( gifID ){
@@ -448,10 +473,16 @@ love.remove = function( gifID ){
       //Save new SET
       love.set( lvd );
 
-    }else{
-      debug.error( "[love.remove]", "FAIL:", "ID does not exist" );
-    }
+    }else{ debug.error( "[love.remove]", "FAIL:", "ID does not exist" ); }
+  });
+}
+love.loved = function( gifID, yes, no ){
+  storage.get( RandME.keys.loved , function( items ){
 
+    var lvd = items[RandME.keys.loved] || new Array();
+    var index = lvd.indexOf( gifID );
+
+    index > -1 ? yes() : no();
   });
 }
 love.list = function( callback ){
@@ -460,6 +491,7 @@ love.list = function( callback ){
     debug.log( "[love.list]",  lvd );
   });
 }
+
 
 
 
