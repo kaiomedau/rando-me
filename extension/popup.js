@@ -175,8 +175,6 @@ function handleRecentTermsListeners(){
 //Remove a speific recent term //triggered by the recent term X button
 function removeRecentSearchTerm( term ){
 
-  term = term.toLowerCase();
-
   recent.remove( term, function(){
     populateRecentSeachTerms();
   });
@@ -189,32 +187,12 @@ function removeRecentSearchTerm( term ){
 //**********************************
 //         SEARCH ACTIONS
 //**********************************
-function handleSearchTerms(term){
-  term = term.toLowerCase();
+function handleSearchTerms( term ){
 
-  storage.get( RandME.keys.recent , function( items ) {
-
-    var rt = items[RandME.keys.recent] || new Array();
-    if(rt.length >= RandME.configs.recents_limit){
-      rt.pop();
-    }
-
-    //Check if term already exists
-    if(rt.indexOf( term ) == -1){
-      //Add recent term
-      rt.unshift( term );
-
-      //Save recents
-      storage.set( RandME.keys.recent, rt, function() {
-        debug.warn( "Term saved", rt );
-      });
-
-    }else{
-      debug.log("termo já existe");
-    }
-
+  recent.add( term , function( items ) {
     populateRecentSeachTerms();
   });
+
 }
 
 //Get the search term and request the GIF
@@ -400,8 +378,37 @@ recent.set = function( data, callback ){
 recent.list = function( callback ){
   storage.get( RandME.keys.recent, callback ) ;
 }
-recent.remove = function( term, callback ){
+recent.add = function( term, callback ){
+  term = term.toLowerCase();
+  recent.list( function( items ) {
 
+    var rt = items[RandME.keys.recent] || new Array();
+
+    //Check if limit was reached
+    if(rt.length >= RandME.configs.recents_limit){
+      rt.pop();
+    }
+
+    //Check if term already exists
+    if( rt.indexOf( term ) == -1 ){
+
+      //Add recent term to set
+      rt.unshift( term );
+
+      //Debug
+      debug.warn("[recent.add]:", "SUCCESS:", term);
+
+      //Replace set
+      recent.set( rt , callback );
+
+    }else{
+      debug.warn("[recent.add]:", "FAIL:", "Search term already exists");
+    }
+
+  });
+}
+recent.remove = function( term, callback ){
+  term = term.toLowerCase();
   recent.list( function( items ) {
 
     var rt = items[RandME.keys.recent] || new Array();
