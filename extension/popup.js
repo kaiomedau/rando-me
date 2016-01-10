@@ -35,7 +35,7 @@ var RandME = {
 }
 
 //Array to handle the recent terms
-var recent_terms_array = new Array();
+// var recent_terms_array = new Array();
 
 
 //As soon DOM complete loading, add all primary event listeners
@@ -63,13 +63,13 @@ function RandoInit(){
 function RandoInitialListeners(){
   //Add the action to the search button
   listener.click( RandME.ui.search_btn, function() {
-    handleSearchClick();
+    handleSearch();
   });
 
   //
   listener.keypress( RandME.ui.search_textfield, function(e) {
     if (e.keyCode == '13') {
-      handleSearchClick();
+      handleSearch();
     }
   });
 
@@ -97,7 +97,7 @@ function RandoInitialListeners(){
 //If given a prefix, the result will contain it
 function termSlug( term, prefix ){
   var slug = term.replace(/[^a-zA-Z ]/g, "");
-      return prefix ? prefix+slug : slug;
+  return prefix ? prefix+slug : slug;
 }
 
 //Return a HTML code for the RECENTS footer containing the given term
@@ -109,7 +109,7 @@ function searchTermToHTML( term ){
 
 function populateRecentSeachTerms(){
 
-  storage.get( RandME.keys.recent, function( items ) {
+  recent.list( function( items ) {
 
     var rt = items[RandME.keys.recent] || new Array();
     var rt_container = element( RandME.ui.recent_terms );
@@ -123,7 +123,7 @@ function populateRecentSeachTerms(){
     rt_container.innerHTML = echo;
 
     //Store the recent terms to create the recent buttons actions
-    recent_terms_array = rt;
+    // recent_terms_array = rt;
 
     //Add the necessary actions to all recent buttons
     handleRecentTermsListeners();
@@ -141,32 +141,35 @@ function populateRecentSeachTerms(){
 //          RECENTS BAR
 //**********************************
 function handleRecentTermsListeners(){
-  if(!recent_terms_array || !recent_terms_array.length){ return; }
 
-  //Loop to get all Buttons and add the listeners to it
-  for (var i = 0; i < recent_terms_array.length; i++) {
+  recent.list( function( items ){
 
-    //Search button
-    var objID = termSlug( recent_terms_array[i] , RandME.constants.recent_term_prefix );
-    listener.click( objID, function() {
-      element( RandME.ui.search_textfield ).value = this.innerHTML;
-      handleSearchClick();
-    });
+    var rt = items[RandME.keys.recent] || new Array();
 
-    //Remove searchterm from bar
-    var removeBtnID = termSlug( recent_terms_array[i] , RandME.constants.recent_term_button_prefix );
-    listener.click( removeBtnID, function() {
+    //Loop to get all Buttons and add the listeners to it
+    for (var i = 0; i < rt.length; i++) {
 
-      var thisID = this.id.replace( RandME.constants.recent_term_button_prefix, RandME.constants.recent_term_prefix );
-      var searchTerm  = element( thisID ).innerHTML;
+      //Search button
+      var objID = termSlug( rt[i] , RandME.constants.recent_term_prefix );
+      listener.click( objID, function() {
+        element( RandME.ui.search_textfield ).value = this.innerHTML;
+        handleSearch();
+      });
 
-      //Remove serachterm
-      removeRecentSearchTerm( searchTerm );
+      //Remove searchterm from bar
+      var removeBtnID = termSlug( rt[i] , RandME.constants.recent_term_button_prefix );
+      listener.click( removeBtnID, function() {
 
-    });
+        var thisID = this.id.replace( RandME.constants.recent_term_button_prefix, RandME.constants.recent_term_prefix );
+        var searchTerm  = element( thisID ).innerHTML;
 
-  };
- }
+        //Remove serachterm
+        removeRecentSearchTerm( searchTerm );
+      });
+
+    };
+  });
+}
 
 
 
@@ -196,7 +199,7 @@ function handleSearchTerms( term ){
 }
 
 //Get the search term and request the GIF
-function handleSearchClick(){
+function handleSearch(){
   var term = element( RandME.ui.search_textfield ).value;
   if(term.length){
     requestRandomGif( term, true);
@@ -369,7 +372,6 @@ storage.remove = function(key){
   chrome.storage.sync.remove( [key] );
 }
 
-
 //**********************************
 //             RECENT
 //  Deal with recent search terms
@@ -434,7 +436,6 @@ recent.remove = function( term, callback ){
       debug.error("[recent.remove]", "FAIL:", "Search term not found");
     }
   });
-
 }
 
 //**********************************
