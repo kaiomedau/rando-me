@@ -20,7 +20,7 @@ Keep in mind that you can always use the thumbs up button as a shortcut.
 - Store `recent search` terms
 - Store `loved GIFs`
 
-
+----
 # Overview
 Everithing is pretty much ready to run.
 
@@ -88,8 +88,29 @@ var RandME = {
 ```
 
 > Replace RandMe.configs.**{api_path}** with your server URL
+
 Feel free to keep the default address `while you develop` your application.
 
+----
+
+# Usage
+
+## Debug
+Instead of calling `console.{command}()`, you can use `debug.{command}()`. This will allow you to stop logs and warnings only by changing the `RandME.configs.**debugging**` value to false.
+
+#### Debug methods
+- Log
+```
+debug.log( "Something to log", ... , obj );
+```
+- Warn
+```
+debug.warn( "Something to warn", ... , obj );
+```
+- Error
+```
+debug.error( "Some error alert", ... , obj );
+```
 
 ----
 
