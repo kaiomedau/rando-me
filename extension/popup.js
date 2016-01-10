@@ -112,7 +112,7 @@ function populateRecentSeachTerms(){
   storage.get( RandME.keys.recent, function( items ) {
 
     var rt = items[RandME.keys.recent] || new Array();
-    var rt_container = document.getElementById( RandME.ui.recent_terms );
+    var rt_container = element( RandME.ui.recent_terms );
 
     var echo = ""; //Final printable HTML
     for (var i = 0; i < rt.length; i++) {
@@ -149,7 +149,7 @@ function handleRecentTermsListeners(){
     //Search button
     var objID = termSlug( recent_terms_array[i] , RandME.constants.recent_term_prefix );
     listener.click( objID, function() {
-      document.getElementById( RandME.ui.search_textfield ).value = this.innerHTML;
+      element( RandME.ui.search_textfield ).value = this.innerHTML;
       handleSearchClick();
     });
 
@@ -158,7 +158,7 @@ function handleRecentTermsListeners(){
     listener.click( removeBtnID, function() {
 
       var thisID = this.id.replace( RandME.constants.recent_term_button_prefix, RandME.constants.recent_term_prefix );
-      var searchTerm  = document.getElementById( thisID ).innerHTML;
+      var searchTerm  = element( thisID ).innerHTML;
 
       //Remove serachterm
       removeRecentSearchTerm( searchTerm );
@@ -197,7 +197,7 @@ function handleSearchTerms( term ){
 
 //Get the search term and request the GIF
 function handleSearchClick(){
-  var term = document.getElementById( RandME.ui.search_textfield ).value;
+  var term = element( RandME.ui.search_textfield ).value;
   if(term.length){
     requestRandomGif( term, true);
   }
@@ -216,9 +216,9 @@ function handleSearchClick(){
 function renderGifResponse(gifURL, gifWidth, gifHeight) {
 
     var status = gifURL ? gifURL : RandME.configs.no_gif_message;// "No GIF found. Sorry :(";
-    document.getElementById( RandME.ui.gif_url ).textContent = status;
+    element( RandME.ui.gif_url ).textContent = status;
 
-    var imageResult = document.getElementById( RandME.ui.gif_img );
+    var imageResult = element( RandME.ui.gif_img );
     imageResult.src = "";
     imageResult.src = gifURL ? gifURL : "images/sad-face.png";
     imageResult.width = gifURL ? gifWidth : 335;
@@ -230,8 +230,8 @@ function renderGifResponse(gifURL, gifWidth, gifHeight) {
 
 function changeLoaderVisibility( hide_loader ){
 
-  var gifContainer    = document.getElementById( RandME.ui.gif_img );
-  var loaderContainer = document.getElementById( RandME.ui.loading );
+  var gifContainer    = element( RandME.ui.gif_img );
+  var loaderContainer = element( RandME.ui.loading );
 
   loaderContainer.className = hide_loader ? "hidden" : "";
 
