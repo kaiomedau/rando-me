@@ -34,15 +34,11 @@ var RandME = {
   }
 }
 
-//Array to handle the recent terms
-// var recent_terms_array = new Array();
-
 
 //As soon DOM complete loading, add all primary event listeners
 //Also populates the recent terms and make a initial search to present a random gif
 document.addEventListener('DOMContentLoaded', function() {
-  //Init Rando
-  RandoInit();
+  RandoInit(); //Init Rando
 });
 
 
@@ -84,17 +80,17 @@ function RandoInitialListeners(){
 
   // love.add('feqkVgjJpYtjy');
   // love.list();
-
-  debug.log( "Teste", "do", "debug" );
-
 }
+
 
 //**********************************
 //      RECENT SEARCH TERMS
+// Deal with the latest searchs bar
 //**********************************
-
-//Return a slug containing only tha A to Z characters
-//If given a prefix, the result will contain it
+/*
+  Return a slug containing only tha A to Z characters
+  If given a prefix, the result will contain it
+*/
 function termSlug( term, prefix ){
   var slug = term.replace(/[^a-zA-Z ]/g, "");
   return prefix ? prefix+slug : slug;
@@ -108,9 +104,7 @@ function searchTermToHTML( term ){
 }
 
 function populateRecentSeachTerms(){
-
   recent.list( function( items ) {
-
     var rt = items[RandME.keys.recent] || new Array();
     var rt_container = element( RandME.ui.recent_terms );
 
@@ -119,31 +113,13 @@ function populateRecentSeachTerms(){
       echo += searchTermToHTML(rt[i]); //Get the HTML code and add to the final output
     };
 
-    //Insert the final content to container
-    rt_container.innerHTML = echo;
-
-    //Store the recent terms to create the recent buttons actions
-    // recent_terms_array = rt;
-
-    //Add the necessary actions to all recent buttons
-    handleRecentTermsListeners();
-
+    rt_container.innerHTML = echo; //Insert the final content to container
+    handleRecentTermsListeners(); //Add the necessary actions to all recent buttons
   });
 }
 
-
-
-
-
-
-
-//**********************************
-//          RECENTS BAR
-//**********************************
 function handleRecentTermsListeners(){
-
   recent.list( function( items ){
-
     var rt = items[RandME.keys.recent] || new Array();
 
     //Loop to get all Buttons and add the listeners to it
@@ -159,30 +135,25 @@ function handleRecentTermsListeners(){
       //Remove searchterm from bar
       var removeBtnID = termSlug( rt[i] , RandME.constants.recent_term_button_prefix );
       listener.click( removeBtnID, function() {
-
         var thisID = this.id.replace( RandME.constants.recent_term_button_prefix, RandME.constants.recent_term_prefix );
         var searchTerm  = element( thisID ).innerHTML;
-
-        //Remove serachterm
-        removeRecentSearchTerm( searchTerm );
+        removeRecentSearchTerm( searchTerm ); //Remove serachterm
       });
 
     };
   });
 }
-
-
-
-
-
 //Remove a speific recent term //triggered by the recent term X button
 function removeRecentSearchTerm( term ){
-
   recent.remove( term, function(){
     populateRecentSeachTerms();
   });
-
 }
+
+
+
+
+
 
 
 
@@ -191,11 +162,9 @@ function removeRecentSearchTerm( term ){
 //         SEARCH ACTIONS
 //**********************************
 function handleSearchTerms( term ){
-
   recent.add( term , function( items ) {
     populateRecentSeachTerms();
   });
-
 }
 
 //Get the search term and request the GIF
@@ -227,20 +196,28 @@ function renderGifResponse(gifURL, gifWidth, gifHeight) {
     imageResult.width = gifURL ? gifWidth : 335;
     imageResult.height = gifURL ? gifHeight : 180;
 
-    changeLoaderVisibility(true);
+    // changeLoaderVisibility(true);
+    loader.hide();
 
 }
 
-function changeLoaderVisibility( hide_loader ){
 
-  var gifContainer    = element( RandME.ui.gif_img );
-  var loaderContainer = element( RandME.ui.loading );
-
-  loaderContainer.className = hide_loader ? "hidden" : "";
-
-  gifContainer.hidden = false;// = hide_loader ? false : true;
-
-}
+var loader = (function () {
+  return {
+    show: function() {
+      var gifContainer    = element( RandME.ui.gif_img );
+      var loaderContainer = element( RandME.ui.loading );
+      loaderContainer.className = "";
+      gifContainer.hidden = false;
+    },
+    hide: function() {
+      var gifContainer    = element( RandME.ui.gif_img );
+      var loaderContainer = element( RandME.ui.loading );
+      loaderContainer.className = "hidden";
+      gifContainer.hidden = false;
+    }
+  }
+}());
 
 
 
@@ -284,7 +261,8 @@ function requestGifByID( gifID ){
 function requestGifFromServer( cmd , param ){
   debug.log( "[getGifImage]:", "Requesting GIF for:", param );
 
-  changeLoaderVisibility(false); //Show loading
+  // changeLoaderVisibility(false); //Show loading
+  loader.show();
 
   // var searchUrl = get_api_url( cmd , encodeURIComponent(param) );
   var x = new XMLHttpRequest(); //Create the request
