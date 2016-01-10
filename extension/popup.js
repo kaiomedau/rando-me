@@ -234,16 +234,11 @@ function requestGifByID( gifID ){
   requestGifFromServer( RandME.commands.byID , gifID ); //Call server
 }
 
-/*
-  Make the final server request
-  * Receive a command (cmd) and a param (ID, search term)
-  ** Once the server responds, render the rreceived image
-*/
+
 function api( cmd, param, success, fail ){
 
-  var x = new XMLHttpRequest(); //Create the request
+  var x = new XMLHttpRequest();
   x.open('GET', api.url( cmd , param ) );
-
   x.responseType = 'json';
 
   x.onload = function(){
@@ -252,7 +247,6 @@ function api( cmd, param, success, fail ){
     if(!r){ debug.error( "[api]", cmd, "FAIL", "No response");
       fail(); return;
     }
-
     if(r.error){ debug.error( "[api]", cmd, "FAIL", response.message);
       fail(); return;
     }else if (!r.data) { debug.error( "[api]", cmd, "FAIL", "Response contains NO DATA");
@@ -271,15 +265,20 @@ function api( cmd, param, success, fail ){
 api.url = function(cmd, param){
   param = encodeURIComponent(param);
   switch(cmd) {
-    case "byid":
-    return RandME.configs.api_path + "?cmd=gif&id=" + param;
+    case RandME.commands.byID:
+    return RandME.configs.api_path + "?cmd="+RandME.commands.byID+"&id=" + param;
         break;
-    case "rand":
+    case RandME.commands.random:
     default:
-      return RandME.configs.api_path + "?cmd=rand&gif=" + param;
+      return RandME.configs.api_path + "?cmd="+RandME.commands.random+"&gif=" + param;
   }
 }
 
+/*
+  Make the final server request
+  * Receive a command (cmd) and a param (ID, search term)
+  ** Once the server responds, render the rreceived image
+*/
 function requestGifFromServer( cmd , param ){
   debug.log( "[getGifImage]:", "Requesting GIF for:", param );
 
@@ -287,52 +286,17 @@ function requestGifFromServer( cmd , param ){
 
   api( cmd, param, function( response ){
 
-    //Debug
-    debug.log("[requestGifFromServer]", "RESPONSE:", response);
-
     var d = response.data; //Response GIF data
     renderGifResponse( d.url, d.width, d.height ); //Display final GIF
-
-  } , function(){
-
-    loader.hide();
-
-  });
-  return;
-
-  var x = new XMLHttpRequest(); //Create the request
-  x.open('GET', get_api_url( cmd , encodeURIComponent(param) ) );
-  x.responseType = 'json';
-
-  x.onload = function() {
-    var response = x.response;
-    if(!response){
-      debug.log( "[requestGifFromServer]:", "No response");
-      return;
-    }
-
-    if(response.error){
-      debug.error( "[requestGifFromServer]:", "ERROR:", response.message);
-      return;
-    }else if (!response.data) {
-      debug.error( "[requestGifFromServer]:", "Response contains NO DATA");
-      return;
-    };
-
-    //Debug
     debug.log("[requestGifFromServer]", "RESPONSE:", response);
 
-    var d = response.data; //Response GIF data
-    renderGifResponse(d.url,d.width,d.height); //Display final GIF
-  };
-
-  x.onerror = function() {
-    debug.error("[getGifImage]:", 'Network error.');
+  } , function(){
     loader.hide();
-  };
-
-  x.send();
+  });
 }
+
+
+
 
 
 //**********************************
