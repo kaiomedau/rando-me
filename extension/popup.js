@@ -176,54 +176,35 @@ function handleSearch(){
 }
 
 
-
-
-
-
-
-
 //**********************************
 //               UI
 //**********************************
-function renderGifResponse(gifURL, gifWidth, gifHeight) {
-
-    var status = gifURL ? gifURL : RandME.configs.no_gif_message;// "No GIF found. Sorry :(";
-    element( RandME.ui.gif_url ).textContent = status;
-
-    var imageResult = element( RandME.ui.gif_img );
-    imageResult.src = "";
-    imageResult.src = gifURL ? gifURL : "images/sad-face.png";
-    imageResult.width = gifURL ? gifWidth : 335;
-    imageResult.height = gifURL ? gifHeight : 180;
-
-    // changeLoaderVisibility(true);
-    loader.hide();
-
-}
-
-
+//Deal with loader visibility
 var loader = (function () {
   return {
     show: function() {
-      var gifContainer    = element( RandME.ui.gif_img );
       var loaderContainer = element( RandME.ui.loading );
       loaderContainer.className = "";
-      gifContainer.hidden = false;
     },
     hide: function() {
-      var gifContainer    = element( RandME.ui.gif_img );
       var loaderContainer = element( RandME.ui.loading );
       loaderContainer.className = "hidden";
-      gifContainer.hidden = false;
     }
   }
 }());
+//Add the result image to UI
+function renderGifResponse(gifURL, gifWidth, gifHeight) {
+  var status = gifURL ? gifURL : RandME.configs.no_gif_message;
+  element( RandME.ui.gif_url ).textContent = status;
 
+  var imageResult       = element( RandME.ui.gif_img );
+  imageResult.src       = "";
+  imageResult.src       = gifURL ? gifURL : "images/sad-face.png";
+  imageResult.width     = gifURL ? gifWidth : 335;
+  imageResult.height    = gifURL ? gifHeight : 180;
 
-
-
-
-
+  loader.hide();
+}
 
 
 
@@ -235,12 +216,12 @@ var loader = (function () {
 /*
   Request a random GIF
 */
-function requestRandomGif( term, store_as_recent_term ){
+function requestRandomGif( term, save_term ){
   if(!term){ return; }
+
   requestGifFromServer( RandME.commands.random , term ); //Call server
 
-  //Save as recent term
-  if(store_as_recent_term){
+  if(save_term){ //Save as recent term
     handleSearchTerms(term);
   }
 }
@@ -258,55 +239,37 @@ function requestGifByID( gifID ){
   * Receive a command (cmd) and a param (ID, search term)
   ** Once the server responds, render the rreceived image
 */
-function requestGifFromServer( cmd , param ){
-  debug.log( "[getGifImage]:", "Requesting GIF for:", param );
+function api( cmd, param, success, fail ){
 
-  // changeLoaderVisibility(false); //Show loading
-  loader.show();
-
-  // var searchUrl = get_api_url( cmd , encodeURIComponent(param) );
   var x = new XMLHttpRequest(); //Create the request
-  x.open('GET', get_api_url( cmd , encodeURIComponent(param) ) );
+  x.open('GET', api.url( cmd , param ) );
+
   x.responseType = 'json';
-  x.onload = function() {
-    var response = x.response;
-    if(response){
 
-      if(response.error){
-        debug.log( "[requestGifFromServer]:", "ERROR:", response.message);
-        return;
-      }else if (!response.data) {
-        debug.log( "[requestGifFromServer]:", "Response contains NO DATA");
-      };
+  x.onload = function(){
 
-    }else{
-      debug.log( "[requestGifFromServer]:", "No response");
-      return;
+    var r = x.response;
+    if(!r){ debug.error( "[api]", cmd, "FAIL", "No response");
+      fail(); return;
     }
 
-    debug.log(response);
+    if(r.error){ debug.error( "[api]", cmd, "FAIL", response.message);
+      fail(); return;
+    }else if (!r.data) { debug.error( "[api]", cmd, "FAIL", "Response contains NO DATA");
+      fail(); return;
+    };
 
-    //Response GIF data
-    var gifURL    = response.data.url;
-    var gifWidth  = response.data.width;
-    var gifHeight = response.data.height;
+    success( r );
+  };
 
-    //Display final GIF
-    renderGifResponse(gifURL,gifWidth,gifHeight);
+  x.onerror = function(){ debug.error( "[api]", cmd, "FAIL", "Network error");
+    fail();
   };
-  x.onerror = function() {
-    debug.log("[getGifImage]:", 'Network error.');
-    loader.hidden = true;
-  };
+
   x.send();
-
 }
-
-/* get_api_url
-//Receive the command key and a second parameter - can be a search term or a gifID
-//Return the final url ready to use
-*/
-function get_api_url( cmd , param ){
+api.url = function(cmd, param){
+  param = encodeURIComponent(param);
   switch(cmd) {
     case "byid":
     return RandME.configs.api_path + "?cmd=gif&id=" + param;
@@ -315,6 +278,60 @@ function get_api_url( cmd , param ){
     default:
       return RandME.configs.api_path + "?cmd=rand&gif=" + param;
   }
+}
+
+function requestGifFromServer( cmd , param ){
+  debug.log( "[getGifImage]:", "Requesting GIF for:", param );
+
+  loader.show(); //Show loading
+
+  api( cmd, param, function( response ){
+
+    //Debug
+    debug.log("[requestGifFromServer]", "RESPONSE:", response);
+
+    var d = response.data; //Response GIF data
+    renderGifResponse( d.url, d.width, d.height ); //Display final GIF
+
+  } , function(){
+
+    loader.hide();
+
+  });
+  return;
+
+  var x = new XMLHttpRequest(); //Create the request
+  x.open('GET', get_api_url( cmd , encodeURIComponent(param) ) );
+  x.responseType = 'json';
+
+  x.onload = function() {
+    var response = x.response;
+    if(!response){
+      debug.log( "[requestGifFromServer]:", "No response");
+      return;
+    }
+
+    if(response.error){
+      debug.error( "[requestGifFromServer]:", "ERROR:", response.message);
+      return;
+    }else if (!response.data) {
+      debug.error( "[requestGifFromServer]:", "Response contains NO DATA");
+      return;
+    };
+
+    //Debug
+    debug.log("[requestGifFromServer]", "RESPONSE:", response);
+
+    var d = response.data; //Response GIF data
+    renderGifResponse(d.url,d.width,d.height); //Display final GIF
+  };
+
+  x.onerror = function() {
+    debug.error("[getGifImage]:", 'Network error.');
+    loader.hide();
+  };
+
+  x.send();
 }
 
 
