@@ -5,6 +5,7 @@ var RandME = {
   configs : {
     debugging         : true, //Set this to false to stop console logs
     recents_limit     : 5,  // Limit the history terms
+    initial_serach    : "Dance", //Seach term for the first request.
     no_gif_message    : "No GIFs found :(",
     api_path          : "http://baleiabalao.com/_apps/rando/", //Server address
   },
@@ -15,8 +16,9 @@ var RandME = {
     translate  : 'trans', //Return a GIF translating the search term
   },
   keys : {
-    recent      : 'recent',
-    loved       : 'loved',
+    recent      : 'recent', //Used to display the recent seach terms
+    loved       : 'loved', //Used to display the loved GIFs
+    last        : 'last', //Used to recover the last GIF loaded
   },
   constants : {
     recent_term_prefix        : 'rt_',
@@ -61,7 +63,8 @@ function RandoInit(){
   populateRecentSeachTerms();
 
   //Make a initial search
-  requestRandomGif('dancing',false);
+  // requestRandomGif('dancing',false);
+  last.load();
 }
 function RandoInitialListeners(){
   //Add the action to the search button
@@ -226,7 +229,12 @@ function requestGifFromServer( cmd , param ){
 //Add the result image to UI
 function renderGifResponse( response ) {
 
+  //Save as last GIF loaded
+  last.set( response.id );
+
+  //Check if gif is loved
   loveUiHandle( response.id );
+
 
   var gifURL = response.url;
   var status = gifURL ? gifURL : RandME.configs.no_gif_message;
@@ -430,7 +438,6 @@ loveUiHandle.addListeners = function(){
 }
 //Love menu
 function loveMenuHandler(){
-
   var m = element( RandME.ui.main );
   var h = element( RandME.ui.hit );
   m.className = m.className ? "" : RandME.constants.opened_class;
@@ -440,13 +447,7 @@ function loveMenuHandler(){
   if(loveopen){
     loveUiHandle.populate();
   }
-
 }
-//Get loved GIFs
-//Check if GIF is loved
-//Add love to GIF
-//Remove love from GIF
-//Display loved GIF
 
 //**********************************
 //          Love Helper
@@ -507,8 +508,29 @@ love.list = function( callback ){
   storage.get( RandME.keys.loved , callback );
 }
 
+//**********************************
+//          LAST Helper
+//**********************************
+function last(){}
+last.set = function(gifID){
+  storage.set( RandME.keys.last, gifID, function() {
+    debug.warn( "[last.set]", "SUCCESS:", gifID);
+  });
+}
+last.get = function( callback ){
+  storage.get( RandME.keys.last , callback );
+}
+last.load = function(){ //Request the last GIF loaded
+  last.get(function( items ){
 
-
+    var lastID = items[RandME.keys.last];
+    if(lastID){
+      requestGifByID( lastID );
+    }else{
+      requestRandomGif( RandME.configs.initial_serach ,false);
+    }
+  });
+}
 
 //**********************************
 //          Debug Helper
