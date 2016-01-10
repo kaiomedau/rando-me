@@ -3,9 +3,10 @@
 //*************************************************
 var RandME = {
   configs : {
-    api_path          : "http://baleiabalao.com/_apps/rando/", //Server address
+    debugging         : true, //Set this to false to stop console logs
     recents_limit     : 5,  // Limit the history terms
     no_gif_message    : "No GIFs found :(",
+    api_path          : "http://baleiabalao.com/_apps/rando/", //Server address
   },
   //API commands //Used to define what parameters do we need to send to the server
   commands : {
@@ -32,7 +33,6 @@ var RandME = {
     loading             : 'loading',
   }
 }
-
 
 //Array to handle the recent terms
 var recent_terms_array = new Array();
@@ -83,7 +83,9 @@ function RandoInitialListeners(){
   });
 
   // love.add('feqkVgjJpYtjy');
-  love.list();
+  // love.list();
+
+  debug.log( "Teste", "do", "debug" );
 
 }
 
@@ -109,13 +111,7 @@ function populateRecentSeachTerms(){
 
   storage.get( RandME.keys.recent, function( items ) {
 
-    //Check if has any recent terms
-    if( !items || !items[RandME.keys.recent] ){
-      console.log("[populateRecentSeachTerms]:", "No recent search terms found");
-      return;
-    }
-
-    var rt = items[RandME.keys.recent];
+    var rt = items[RandME.keys.recent] || new Array();
     var rt_container = document.getElementById( RandME.ui.recent_terms );
 
     var echo = ""; //Final printable HTML
@@ -172,38 +168,20 @@ function handleRecentTermsListeners(){
   };
  }
 
+
+
+
+
 //Remove a speific recent term //triggered by the recent term X button
-function removeRecentSearchTerm(term){
+function removeRecentSearchTerm( term ){
+
   term = term.toLowerCase();
-  console.log("[removeRecentSearchTerm]:", "Term to remove:",term)
 
-  storage.get( RandME.keys.recent, function( items ) {
-    if(!items || !items[RandME.keys.recent]){
-      console.log("[removeRecentSearchTerm]:", "History not found");
-      return;
-    }
-
-    var rt = items[RandME.keys.recent];
-    var index = rt.indexOf( term );
-
-    if(index > -1){
-
-      rt.splice(index, 1); //Remove term
-
-      storage.set( RandME.keys.recent, rt , function() {
-          console.log( "[removeRecentSearchTerm]:","Term removed:",term );
-      });
-
-    }
-
+  recent.remove( term, function(){
     populateRecentSeachTerms();
-
   });
 
 }
-
-
-
 
 
 
@@ -228,11 +206,11 @@ function handleSearchTerms(term){
 
       //Save recents
       storage.set( RandME.keys.recent, rt, function() {
-        console.log( "Term saved", rt );
+        debug.warn( "Term saved", rt );
       });
 
     }else{
-      console.log("termo já existe");
+      debug.log("termo já existe");
     }
 
     populateRecentSeachTerms();
@@ -323,7 +301,7 @@ function requestGifByID( gifID ){
   ** Once the server responds, render the rreceived image
 */
 function requestGifFromServer( cmd , param ){
-  console.log( "[getGifImage]:", "Requesting GIF for:", param );
+  debug.log( "[getGifImage]:", "Requesting GIF for:", param );
 
   changeLoaderVisibility(false); //Show loading
 
@@ -336,18 +314,18 @@ function requestGifFromServer( cmd , param ){
     if(response){
 
       if(response.error){
-        console.log( "[requestGifFromServer]:", "ERROR:", response.message);
+        debug.log( "[requestGifFromServer]:", "ERROR:", response.message);
         return;
       }else if (!response.data) {
-        console.log( "[requestGifFromServer]:", "Response contains NO DATA");
+        debug.log( "[requestGifFromServer]:", "Response contains NO DATA");
       };
 
     }else{
-      console.log( "[requestGifFromServer]:", "No response");
+      debug.log( "[requestGifFromServer]:", "No response");
       return;
     }
 
-    console.log(response);
+    debug.log(response);
 
     //Response GIF data
     var gifURL    = response.data.url;
@@ -358,7 +336,7 @@ function requestGifFromServer( cmd , param ){
     renderGifResponse(gifURL,gifWidth,gifHeight);
   };
   x.onerror = function() {
-    console.log("[getGifImage]:", 'Network error.');
+    debug.log("[getGifImage]:", 'Network error.');
     loader.hidden = true;
   };
   x.send();
@@ -382,6 +360,18 @@ function get_api_url( cmd , param ){
 
 
 
+
+//**********************************
+//         LISTENER HELPER
+//**********************************
+function listener(){}
+listener.click = function( objID, callback ){
+  document.getElementById( [objID] ).addEventListener( 'click', callback );
+}
+listener.keypress = function ( objID, callback ){
+  document.getElementById( [objID] ).addEventListener( 'keypress', callback );
+}
+
 //**********************************
 //             STORAGE
 //**********************************
@@ -396,18 +386,44 @@ storage.remove = function(key){
   chrome.storage.sync.remove( [key] );
 }
 
-//**********************************
-//         LISTENER HELPER
-//**********************************
-function listener(){}
-listener.click = function( objID, callback ){
-  document.getElementById( [objID] ).addEventListener( 'click', callback );
-}
-listener.keypress = function ( objID, callback ){
-  document.getElementById( [objID] ).addEventListener( 'keypress', callback );
-}
 
+//**********************************
+//             RECENT
+//  Deal with recent search terms
+//**********************************
+function recent(){};
+recent.set = function( data, callback ){
+  storage.set( RandME.keys.recent, data, callback ? callback : function() {
+    debug.log( "[recent.set]", "Success", data);
+  });
+}
+recent.list = function( callback ){
+  storage.get( RandME.keys.recent, callback ) ;
+}
+recent.remove = function( term, callback ){
 
+  recent.list( function( items ) {
+
+    var rt = items[RandME.keys.recent] || new Array();
+    var index = rt.indexOf( term );
+
+    if(index > -1){
+
+      //Remove searchterm from set
+      rt.splice(index, 1);
+
+      //Debug
+      debug.warn("[recent.remove]:", "SUCCESS:", term);
+
+      //Replace set
+      recent.set( rt , callback );
+
+    }else{
+      debug.error("[recent.remove]", "FAIL:", "Search term not found");
+    }
+  });
+
+}
 
 //**********************************
 //          Loving GIFs
@@ -420,7 +436,7 @@ listener.keypress = function ( objID, callback ){
 function love(){}
 love.set = function( data, callback ){
   storage.set( RandME.keys.loved, data, callback ? callback : function() {
-    console.log( "[love.set]", "Success", data);
+    debug.warn( "[love.set]", "SUCCESS:", data);
   });
 }
 love.add = function( gifID ){
@@ -432,11 +448,14 @@ love.add = function( gifID ){
       //Add gifID to the set
       lvd.unshift( gifID );
 
+      //Debug
+      debug.warn( "[love.add]", "SUCCESS:", gifID );
+
       //Save set
       love.set( lvd );
 
     }else{
-      console.log( "[love.add]", "FAIL", "ID already exists" );
+      debug.error( "[love.add]", "FAIL:", "ID already exists" );
     }
 
   });
@@ -451,11 +470,14 @@ love.remove = function( gifID ){
       //Remove gifID from set
       lvd.splice(index, 1);
 
+      //Debug
+      debug.warn( "[love.remove]" , "SUCCESS:", gifID );
+
       //Save new SET
       love.set( lvd );
 
     }else{
-      console.log( "[love.remove]", "FAIL", "ID does not exist" );
+      debug.error( "[love.remove]", "FAIL:", "ID does not exist" );
     }
 
   });
@@ -463,6 +485,34 @@ love.remove = function( gifID ){
 love.list = function( callback ){
   storage.get( RandME.keys.loved , function( items ){
     var lvd = items[RandME.keys.loved];
-    console.log( "[love.list]",  lvd );
+    debug.log( "[love.list]",  lvd );
   });
 }
+
+
+
+//**********************************
+//          Debug Helper
+//**********************************
+var debug = (function () {
+  return {
+    log: function() {
+      if(RandME.configs.debugging){
+        var args = Array.prototype.slice.call(arguments);
+        console.log.apply(console, args);
+      }
+    },
+    warn: function() {
+      if(RandME.configs.debugging){
+        var args = Array.prototype.slice.call(arguments);
+        console.warn.apply(console, args);
+      }
+    },
+    error: function() {
+      if(RandME.configs.debugging){
+        var args = Array.prototype.slice.call(arguments);
+        console.error.apply(console, args);
+      }
+    }
+  }
+}());
