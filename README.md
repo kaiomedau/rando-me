@@ -16,21 +16,22 @@ Keep in mind that you can always use the thumbs up button as a shortcut.
 ## Features:
 - Request random GIFs by `search term`
 - Request specific GIFs `by ID`
-- Request a `translation` GIF - Translates a keyword into image eg.: "NO" will return a random GIF of someone saying "NO"
+- Request a `translation` GIF - Translates a keyword into image eg.: "NO" will return someone saying "NO"
 - Store `recent search` terms
 - Store `loved GIFs`
 
 
 # Overview
 Everithing is pretty much ready to run.
+
 You will only need to:
-- Rename the `config.example.php`
-- Upload the contents of `server folder` to your server
-- Inform the `popup.js` the final API address
+- Rename the file `config.example.php`
+- Upload the contents of the `server folder` to your server
+- Inform the final API address to `popup.js`
 
 
 ## Server Setup:
-The `congif.php` file holds your `Giphy API key` used for making your GIF and search requests.
+The `congif.php` file holds your `Giphy API key` used to make your `GIF` and `search requests`.
 > **Note:** rename `server/includes/config-example.php` to `server/includes/config.php`.
 
 Please use the `Giphy Public key` - *already inside config.example.php* - while you develop your application and experiment with your integrations.
@@ -40,9 +41,10 @@ Please use the `Giphy Public key` - *already inside config.example.php* - while 
 
 ### Extension Setup:
 All customizable data is kept inside `RandME` object.
-> **Note:** you will not need to change anything else inside popup.js. All requests will make reference to `RandME`.
+> **Note:** you will not need to change anything else inside popup.js. All requests will make reference to `RandME` and its keys.
 
-```var RandME = {
+```
+<pre>var RandME = {
   configs : {
     debugging         : true,                   //Set this to false to stop console logs
     recents_limit     : 5,                      //Limit the history terms
@@ -80,7 +82,8 @@ All customizable data is kept inside `RandME` object.
     gif_img             : 'gif_img',
     loading             : 'loading',
   }
-}```
+}
+</pre>```
 
 > Replace RandMe.configs.**{api_path}** with your server URL
 Feel free to keep the default address `while you develop` your application.
