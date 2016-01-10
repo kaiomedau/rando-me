@@ -22,9 +22,12 @@ var RandME = {
     recent_term_prefix        : 'rt_',
     recent_term_button_prefix : 'brt_',
     loved_class               : 'loved',
+    opened_class              : 'open',
+    visible_class             : 'visible',
   },
   ui : {
     main                : 'main',
+    hit                 : 'hit',
     search_btn          : 'serach_btn',
     search_textfield    : 'search_textfield',
     thumbs_up_btn       : 'thumbs_up',
@@ -36,6 +39,8 @@ var RandME = {
     loading             : 'loading',
   }
 }
+
+var loveopen = false;
 
 
 //As soon DOM complete loading, add all primary event listeners
@@ -58,7 +63,6 @@ function RandoInit(){
   //Make a initial search
   requestRandomGif('dancing',false);
 }
-
 function RandoInitialListeners(){
   //Add the action to the search button
   listener.click( RandME.ui.search_btn, function() {
@@ -82,10 +86,8 @@ function RandoInitialListeners(){
     loveUiHandle.change( this );
   });
 
-  listener.click( RandME.ui.love_menu_btn, function(){
-    var c = element( RandME.ui.main ).className;
-    element( RandME.ui.main ).className = c ? "" : "open";
-  });
+  listener.click( RandME.ui.love_menu_btn, function(){ loveMenuHandler(); });
+  listener.click( RandME.ui.hit, function(){ loveMenuHandler(); });
 }
 
 
@@ -101,14 +103,12 @@ function termSlug( term, prefix ){
   var slug = term.replace(/[^a-zA-Z ]/g, "");
   return prefix ? prefix+slug : slug;
 }
-
 //Return a HTML code for the RECENTS footer containing the given term
 function searchTermToHTML( term ){
   var slug    = termSlug(term, RandME.constants.recent_term_prefix);
   var btnSlug = termSlug(term, RandME.constants.recent_term_button_prefix);
   return "<div class='search-term'><div class='term' id='"+ slug +"'>"+term+"</div><button class='remove-term' id='" + btnSlug + "''>x</button></div>";
 }
-
 function populateRecentSeachTerms(){
   recent.list( function( items ) {
     var rt = items[RandME.keys.recent] || new Array();
@@ -123,7 +123,6 @@ function populateRecentSeachTerms(){
     handleRecentTermsListeners(); //Add the necessary actions to all recent buttons
   });
 }
-
 function handleRecentTermsListeners(){
   recent.list( function( items ){
     var rt = items[RandME.keys.recent] || new Array();
@@ -156,9 +155,6 @@ function removeRecentSearchTerm( term ){
   });
 }
 
-
-
-
 //**********************************
 //         SEARCH ACTIONS
 //**********************************
@@ -167,7 +163,6 @@ function handleSearchTerms( term ){
     populateRecentSeachTerms();
   });
 }
-
 //Get the search term and request the GIF
 function handleSearch(){
   var term = element( RandME.ui.search_textfield ).value;
@@ -177,21 +172,8 @@ function handleSearch(){
 }
 
 //**********************************
-//               UI
+//            REQUESTS
 //**********************************
-
-
-
-
-
-
-
-
-
-
-
-
-
 //Deal with loader visibility
 var loader = (function () {
   return {
@@ -205,31 +187,6 @@ var loader = (function () {
     }
   }
 }());
-//Add the result image to UI
-function renderGifResponse( response ) {
-
-  loveUiHandle( response.id );
-
-  var gifURL = response.url;
-  var status = gifURL ? gifURL : RandME.configs.no_gif_message;
-  element( RandME.ui.gif_url ).textContent = status;
-
-  var imageResult       = element( RandME.ui.gif_img );
-  imageResult.src       = "";
-  imageResult.src       = gifURL ? gifURL : "images/sad-face.png";
-  imageResult.width     = gifURL ? response.width   : 335;
-  imageResult.height    = gifURL ? response.height  : 180;
-
-  loader.hide();
-}
-
-
-
-
-
-//**********************************
-//            REQUESTS
-//**********************************
 /*
   Request a random GIF
 */
@@ -265,6 +222,23 @@ function requestGifFromServer( cmd , param ){
   } , function(){
     loader.hide();
   });
+}
+//Add the result image to UI
+function renderGifResponse( response ) {
+
+  loveUiHandle( response.id );
+
+  var gifURL = response.url;
+  var status = gifURL ? gifURL : RandME.configs.no_gif_message;
+  element( RandME.ui.gif_url ).textContent = status;
+
+  var imageResult       = element( RandME.ui.gif_img );
+  imageResult.src       = "";
+  imageResult.src       = gifURL ? gifURL : "images/sad-face.png";
+  imageResult.width     = gifURL ? response.width   : 335;
+  imageResult.height    = gifURL ? response.height  : 180;
+
+  loader.hide();
 }
 
 //**********************************
@@ -424,6 +398,50 @@ loveUiHandle.change = function( obj ){
     obj.className = RandME.constants.loved_class + " " + c[0];
   }
 }
+loveUiHandle.toHTML = function( gifID ){
+  return "<div id='"+ gifID +"' class='loved_gif'><img src='http://media3.giphy.com/media/"+ gifID +"/giphy.gif' /></div>"
+}
+loveUiHandle.populate = function(){
+  love.list( function( items ){
+
+    var lvd = items[RandME.keys.loved] || new Array();
+    var echo = ""; //Final printable HTML
+    for (var i = 0; i < lvd.length; i++) {
+      echo += loveUiHandle.toHTML( lvd[i] ); //Get the HTML code and add to the final output
+    };
+
+    element("loved_gifs").innerHTML = echo; //Insert the final content to container
+
+    loveUiHandle.addListeners();
+  });
+}
+loveUiHandle.addListeners = function(){
+  love.list( function( items ){
+    var lvd = items[RandME.keys.loved] || new Array();
+    for (var i = 0; i < lvd.length; i++) {
+      listener.click( lvd[i] , function(){
+
+        loveMenuHandler();
+        requestGifByID( this.id );
+
+      } );
+    };
+  });
+}
+//Love menu
+function loveMenuHandler(){
+
+  var m = element( RandME.ui.main );
+  var h = element( RandME.ui.hit );
+  m.className = m.className ? "" : RandME.constants.opened_class;
+  h.className = h.className ? "" : RandME.constants.visible_class;
+
+  loveopen = loveopen ? false : true;
+  if(loveopen){
+    loveUiHandle.populate();
+  }
+
+}
 //Get loved GIFs
 //Check if GIF is loved
 //Add love to GIF
@@ -486,10 +504,7 @@ love.loved = function( gifID, yes, no ){
   });
 }
 love.list = function( callback ){
-  storage.get( RandME.keys.loved , function( items ){
-    var lvd = items[RandME.keys.loved];
-    debug.log( "[love.list]",  lvd );
-  });
+  storage.get( RandME.keys.loved , callback );
 }
 
 
