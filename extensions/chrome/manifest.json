@@ -3,7 +3,7 @@
   "name": "Rando.me a GIF",
   "short_name" : "Rando.me",
   "description": "An easy way to find random GIFs",
-  "version": "0.2",
+  "version": "0.2.1",
 
   "browser_action": {
     "default_icon": {
