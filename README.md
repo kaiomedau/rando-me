@@ -3,7 +3,7 @@
    <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg" />
 </p>
 
-**Rando.me a GIF** is a Google Chrome extension that makes find GIFs an easy and fun task. Just type the desired keyword and let us do the rest! You will receive a related random GIF in seconds.
+**Rando.me a GIF** is a Google Chrome extension that makes finding GIFs an easy and fun task. Just type the desired keyword and let us do the rest! You will receive a related random GIF in seconds.
 
 The history bar will keep track of your latest terms making it easy for you to get a new image in seconds
 > If you are connected to Google Chrome, this feature will be cross devices.
@@ -29,8 +29,9 @@ You will only need to:
 - Upload the contents of the `server folder` to your server
 - Inform the final API address to `popup.js`
 
-
-## Server Setup:
+----
+# Setup
+### Server Setup:
 The `congif.php` file holds your `Giphy API key` used to make your `GIF` and `search requests`.
 > **Note:** rename `server/includes/config-example.php` to `server/includes/config.php`.
 
@@ -96,7 +97,7 @@ Feel free to keep the default address `while you develop` your application.
 # Usage
 
 ## Debug
-Instead of calling `console.{command}()`, you can use `debug.{command}()`. This will allow you to stop logs and warnings only by changing the `RandME.configs.**debugging**` value to false.
+Instead of calling `console.{command}()`, you can use `debug.{command}()`. This will allow you to stop logs and warnings only by changing the **RandME.configs.**`debugging` value to false.
 
 #### Debug methods
 - Log
