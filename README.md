@@ -1,5 +1,5 @@
 <p align="center">
-   <img src="https://raw.githubusercontent.com/kaiomedau/rando-me/master/google-chrome/layout/Chrome-Store/store_rando_tile_440.png" alt="Rando.me a GIF" /><br/>
+   <img src="https://raw.githubusercontent.com/kaiomedau/rando-me/master/_layout/Chrome-Store/store_rando_tile_440.png" alt="Rando.me a GIF" /><br/>
    <img alt="License" src="https://img.shields.io/badge/license-MIT-blue.svg" />
 </p>
 
@@ -92,6 +92,7 @@ var RandME = {
 
 Feel free to keep the default address `while you develop` your application.
 
+
 ----
 
 # Usage
@@ -112,6 +113,13 @@ debug.warn( "Something to warn", ... , obj );
 ```
 debug.error( "Some error alert", ... , obj );
 ```
+
+
+----
+
+# Firefox:
+- Depends on `node.js` and npm
+- Install `jpm` with `npm install jpm --global` and `jpm run` on firefox folder.
 
 ----
 
