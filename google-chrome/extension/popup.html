@@ -7,24 +7,41 @@
     <script src="popup.js"></script>
   </head>
   <body>
-    <header>
-        <input id="search_term" placeholder="Search term">
-        <button id="request_gif"></button>
-        <button id="thumbs_up"></button>
-    </header>
 
-    <div id="wrapper">
-      <img id="gif_img" hidden>
-      <div id="gif_url">GIF URL</div>
-      <div id="loading" class="hidden"></div>
+    <div id="loved_bar">
+      <nav id="loved_gifs">
+        <!-- <div class="loved_gif"><img src="http://media3.giphy.com/media/26tPplGWjN0xLybiU/giphy.gif" alt="" /></div> -->
+      </nav>
     </div>
 
-    <footer>
-      <nav id="recent_terms">
-        <!-- <div class="search-term"><div class="term">dog</div><button class="remove-term">x</button></div> -->
-      </nav>
-      <div id="giphy_logo"></div>
-    </footer>
+    <div id="main">
+
+      <header>
+          <input id="search_textfield" placeholder="Search term">
+          <button id="serach_btn"></button>
+          <button id="thumbs_up"></button>
+      </header>
+
+      <div id="wrapper">
+        <img id="gif_img" hidden>
+        <nav id="git_meta">
+          <div id="gif_url">GIF URL</div>
+          <div id="love_gif"></div>
+          <div id="loved_menu_btn"></div>
+        </nav>
+        <div id="loading" class="hidden"></div>
+      </div>
+
+      <footer>
+        <nav id="recent_terms">
+          <!-- <div class="search-term"><div class="term">dog</div><button class="remove-term">x</button></div> -->
+        </nav>
+        <div id="giphy_logo"></div>
+      </footer>
+
+      <div id="hit"></div>
+
+    </div>
 
   </body>
 </html>

@@ -4,10 +4,11 @@ input:focus,select:focus,textarea:focus,button:focus {
 body {
   font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
   font-size: 100%;
-  background: #34414c;
+  background: #23303a;
   width: 400px;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 img{
   height: auto;
@@ -28,9 +29,39 @@ footer{
   border-bottom: solid 3px #38d385;
 }
 /************************
+******** MAIN ********
+************************/
+#main{
+  position: relative;
+  background: #34414c;
+  overflow: hidden;
+  width: 400px;
+
+  transition: margin-left 200ms;
+}
+  #main.open{
+    margin-left: -160px;
+  }
+
+#hit{
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: none;
+  opacity: 0;
+  background: #34414c;
+
+  transition: opacity 1s;
+}
+  #hit.visible{
+    opacity: .6;
+    display: block;
+  }
+
+/************************
 ******** Header ********
 ************************/
-  #search_term{
+  #search_textfield{
     background: #1f2b35;
     border: none;
     border-radius: 8px 0 0 8px;
@@ -43,7 +74,7 @@ footer{
     width: 193px;
     font-size: 14px;
   }
-  #request_gif{
+  #serach_btn{
     background: url(images/magnifying.png) no-repeat 50% 50% #38d385;
     border: none;
     border-radius: 0 8px 8px 0;
@@ -51,7 +82,7 @@ footer{
     height: 42px;
     float: left;
   }
-    #request_gif:hover{
+    #serach_btn:hover{
       background-color: #d92196;
     }
   #thumbs_up{
@@ -74,14 +105,14 @@ footer{
 #wrapper{
   background: url(images/rando_bg.png) no-repeat 50% 50% #34414c;
   text-align: center;
-  padding: 30px;
   color: #506272;
   position: relative;
   min-height: 200px;
+  overflow: auto;
 }
   #gif_img{
     display: block;
-    margin: 0 auto;
+    margin: 30px auto 12px auto;
     border-radius: 4px;
     min-height: 200px;
   }
@@ -102,35 +133,61 @@ footer{
       visibility: hidden;
     }
 
-  #gif_url {
-    white-space: pre;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    display: block;
-    font-size: 10px;
-    padding: 11px 25px;
-    background: #3c4b58;
-    border-radius: 8px;
-    margin-top: 12px;
-    box-shadow: 0px 2px 0px #2f3d48;
+  #git_meta{
+    text-align: left;
+    position: relative;
+    margin-bottom: 14px;
   }
-    #gif_url::selection {
-      background: #da6f6f;
+    #gif_url {
+      white-space: pre;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      display: inline-block;
+      font-size: 10px;
+      padding: 11px 25px;
+      background: #3c4b58;
+      border-radius: 8px;
+      box-shadow: 0px 2px 0px #2f3d48;
+      width: 236px;
+      margin-left: 30px;
     }
+      #gif_url::selection {
+        background: #da6f6f;
+      }
 
-  #love_gif{
-    -webkit-mask-image: url(images/love.svg);
-    background-color: #465664;
-    width: 28px;
-    height: 26px;
-  }
-    #love_gif.loved{
-      background-color: #da6f6f;
+    #love_gif{
+      position: absolute;
+      top: 4px;
+      right: 36px;
+      display: block;
+      width: 28px;
+      height: 26px;
+      -webkit-mask-image: url(images/love.svg);
+      background-color: #465664;
+      margin-left:14px;
     }
-    #love_gif:hover{
-      background-color: #c55757;
-      cursor: pointer;
+      #love_gif.loved{
+        background-color: #da6f6f;
+      }
+      #love_gif:hover{
+        background-color: #c55757;
+        cursor: pointer;
+      }
+
+    #loved_menu_btn{
+      background: url(images/love-menu.png) no-repeat 100% 48%;
+      width: 30px;
+      height:100%;
+      display: inline-block;
+      position: absolute;
+      right: 0;
+      top: 0;
     }
+      #loved_menu_btn:hover{
+        background: url(images/love-menu-hover.png) no-repeat 100% 48%;
+        cursor: pointer;
+      }
+
 
 /************************
 ******** Footer ********
@@ -190,3 +247,36 @@ footer{
         float: right;
       }
 
+/**************************
+******** Loved Bar ********
+**************************/
+#loved_bar{
+  background: url(images/love_bg.svg) no-repeat 54px 50% #23303a;
+  position: absolute;
+  top: 0;
+  right: -20px;
+  width: 180px; /*Hack to hide the scrollbar*/
+  height: 100%;
+
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+  #loved_gifs{
+    width: 160px;
+    text-align: center;
+  }
+    #loved_gifs .loved_gif:hover{
+      cursor: pointer;
+    }
+      #loved_gifs .loved_gif img{
+        max-width: 140px;
+        /*max-height: 80px;*/
+        /*margin-top: 20px;*/
+        margin: 5px auto;
+      }
+        #loved_gifs .loved_gif:first-child img{
+          margin-top: 10px;
+        }
+        #loved_gifs .loved_gif:last-child img{
+          margin-bottom: 10px;
+        }

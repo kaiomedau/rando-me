@@ -22,9 +22,14 @@ require_once("$path/config.php");
 $apiPATH;
 $command = $_GET["cmd"];
 switch ($command) {
+    case 'byid':
     case 'gif':
         $requestID = $_GET["id"];
         $apiPATH = "http://api.giphy.com/v1/gifs/$requestID?api_key=$apiKEY";
+        break;
+    case 'trans':
+        $searchTerm = str_replace(" ", "+", $_GET["gif"] );
+        $apiPATH = "http://api.giphy.com/v1/gifs/translate?s=$searchTerm&api_key=$apiKEY";
         break;
     case 'rand':
     default:
