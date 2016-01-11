@@ -50,9 +50,11 @@ footer{
   display: none;
   opacity: 0;
   background: #34414c;
-
   transition: opacity 1s;
 }
+  #hit:hover{
+    cursor: pointer;
+  }
   #hit.visible{
     opacity: .6;
     display: block;
