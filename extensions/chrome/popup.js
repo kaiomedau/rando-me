@@ -196,7 +196,7 @@ var loader = (function () {
 function requestRandomGif( term, save_term ){
   if(!term){ return; }
 
-  requestGifFromServer( RandME.commands.random , term ); //Call server
+  requestGifFromServer( RandME.commands.random , term.toLowerCase() ); //Call server
 
   if(save_term){ //Save as recent term
     handleSearchTerms(term);
