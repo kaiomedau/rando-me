@@ -241,7 +241,13 @@ function renderGifResponse( response ) {
   element( RandME.ui.gif_url ).textContent = status;
 
   var imageResult       = element( RandME.ui.gif_img );
-  imageResult.src       = "";
+
+  //Clean image before rendering the next one
+  imageResult.removeAttribute("src");
+  imageResult.removeAttribute("width");
+  imageResult.removeAttribute("height");
+
+  //Render the next image
   imageResult.src       = gifURL ? gifURL : "images/sad-face.png";
   imageResult.width     = gifURL ? response.width   : 335;
   imageResult.height    = gifURL ? response.height  : 180;
