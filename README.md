@@ -29,6 +29,10 @@ You will only need to:
 - Upload the contents of the `server folder` to your server
 - Inform the final API address to `popup.js`
 
+### Structure
+All extensions will be kept inside the, also called, `extensions` folder.
+> Note that the `chrome` folder is the only one containing ready to use code. All the others still under development.
+
 ----
 # Setup
 ### Server Setup:
@@ -96,6 +100,37 @@ Feel free to keep the default address `while you develop` your application.
 ----
 
 # Usage
+## Init
+As soon the document is done loading the `DOMContentLoaded` will be triggered. This will execute the `RandoInit()` function that holds all initial actions.
+```
+function RandoInit(){
+  RandoInitialListeners();      //Add the initial listeners to all ui elements
+  populateRecentSeachTerms();   //Populates the recents bar
+  last.load();                  //Load the last GIF seen
+  //requestRandomGif( RandME.configs.initial_serach ,false); //Make a initial search
+}
+```
+> Note: If you do prefere to make a random request when starting the plugin, you nedd to comment the `last.load();` and uncomment the `requestRandomGif(...);` lines.
+
+
+## GIF Requests
+> All requests will automatic render the result image to the UI.
+
+### Random GIF
+`requestRandomGif` will return a random GIF related to a given search term.
+```
+requestRandomGif( term, save_term );
+```
+- **term** - `String`: Keyword to be searched
+- **save_term** - `Boolean`: If the term sould be stored as recent term. If `false`, it will not apear at the recents bar.
+
+### Specific GIF
+`requestGifByID` will return a specific GIF based on it's ID.
+```
+function requestGifByID( gifID );
+```
+- **gifID** - `String`: Object id.
+
 
 ## Debug
 Instead of calling `console.{command}()`, you can use `debug.{command}()`. This will allow you to stop logs and warnings only by changing the **RandME.configs.**`debugging` value to false.
