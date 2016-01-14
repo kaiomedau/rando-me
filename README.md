@@ -20,6 +20,7 @@ Keep in mind that you can always use the thumbs up button as a shortcut.
 - Store `recent search` terms
 - Store `loved GIFs`
 
+
 ----
 # Overview
 Everithing is pretty much ready to run.
@@ -29,9 +30,12 @@ You will only need to:
 - Upload the contents of the `server folder` to your server
 - Inform the final API address to `popup.js`
 
+
 ### Structure
 All extensions will be kept inside the, also called, `extensions` folder.
 > Note that the `chrome` folder is the only one containing ready to use code. All the others still under development.
+
+
 
 ----
 # Setup
@@ -104,13 +108,17 @@ Feel free to keep the default address `while you develop` your application.
 As soon the document is done loading the `DOMContentLoaded` will be triggered. This will execute the `RandoInit()` function that holds all initial actions.
 ```
 function RandoInit(){
+
   RandoInitialListeners();      //Add the initial listeners to all ui elements
+
   populateRecentSeachTerms();   //Populates the recents bar
+
   last.load();                  //Load the last GIF seen
   //requestRandomGif( RandME.configs.initial_serach ,false); //Make a initial search
 }
 ```
 > Note: If you do prefere to make a random request when starting the plugin, you nedd to comment the `last.load();` and uncomment the `requestRandomGif(...);` lines.
+
 
 
 ## GIF Requests
@@ -132,22 +140,68 @@ function requestGifByID( gifID );
 - **gifID** - `String`: Object id.
 
 
+
+## Storage
+As each browser deals with storage its own way, `storage class` is used to unify this actions in a single place. Therefore, once you start a development for a new browser, you will need to interact with this methods.
+```
+function storage(){}
+storage.get = function( key, callback ){}
+storage.set = function( key, data, callback ){}
+storage.remove = function(key){}
+```
+
+### Recent
+Deal with recently searched keywords. This methods can be called to retrieve, save and delete search terms.
+```
+function recent(){};
+recent.set = function( data, callback ){}
+recent.list = function( callback ){}
+recent.add = function( term, callback ){}
+recent.remove = function( term, callback ){}
+```
+
+#### Recent.List
+Retrieves all saved keywords save as recent terms and executes the callback function.
+```
+recent.list( function( items ) {
+    var recentTerms = items[RandME.keys.recent] || new Array();
+    debug.log( recentTerms );
+    //console.log( recentTerms );
+} );
+```
+
+#### Recent.Add
+Adds a new term, if not yet exists, to the `recents object`. It will include the given term, save it and execute the callback function.
+```
+recent.add( "My term", function(){
+  debug.log( "Term added:", "My term" );
+  //console.log( "Term added:", "My term" );
+} );
+```
+
+#### Recent.Remove
+Removes a specific term from the `recents object`. It will remove the given term and execute the callback function.
+```
+recent.remove( "My term", function(){
+  debug.log( "Term removed:", "My term" );
+  //console.log( "Term removed:", "My term" );
+} );
+```
+
+
+
 ## Debug
 Instead of calling `console.{command}()`, you can use `debug.{command}()`. This will allow you to stop logs and warnings only by changing the **RandME.configs.**`debugging` value to false.
-
-#### Debug methods
-- Log
 ```
 debug.log( "Something to log", ... , obj );
 ```
-- Warn
 ```
 debug.warn( "Something to warn", ... , obj );
 ```
-- Error
 ```
 debug.error( "Some error alert", ... , obj );
 ```
+
 
 
 ----
@@ -155,6 +209,9 @@ debug.error( "Some error alert", ... , obj );
 # Firefox:
 - Depends on `node.js` and npm
 - Install `jpm` with `npm install jpm --global` and `jpm run` on firefox folder.
+
+
+
 
 ----
 
